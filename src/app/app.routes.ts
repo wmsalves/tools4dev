@@ -7,6 +7,12 @@ export const routes: Routes = [
     title: 'Tools4Dev • Home',
   },
   {
+    path: 'cpf-generator',
+    loadComponent: () =>
+      import('./pages/cpf-generator/cpf-generator.component').then((m) => m.CpfGeneratorComponent),
+    title: 'Tools4Dev • CPF Generator',
+  },
+  {
     path: 'qr-code',
     loadComponent: () => import('./pages/qr-code/qr-code.component').then((m) => m.QrCodeComponent),
     title: 'Tools4Dev • QR Code',

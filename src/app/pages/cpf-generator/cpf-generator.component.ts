@@ -1,11 +1,12 @@
-import { Component, effect, inject, signal, WritableSignal } from '@angular/core';
+import { Component, inject, signal, computed, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CpfService } from '../../core/services/cpf.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   standalone: true,
   selector: 'app-cpf-generator',
-  imports: [FormsModule],
+  imports: [CommonModule, FormsModule],
   providers: [CpfService],
   template: `
     <h1>CPF Generator</h1>
@@ -15,9 +16,9 @@ import { CpfService } from '../../core/services/cpf.service';
 
     <section class="panel">
       <div class="row">
-        <button (click)="gen(true)">Generate (formatted)</button>
-        <button (click)="gen(false)">Generate (digits only)</button>
-        <button [disabled]="!result()" (click)="copy()">Copy</button>
+        <button type="button" (click)="gen(true)">Generate (formatted)</button>
+        <button type="button" (click)="gen(false)">Generate (digits only)</button>
+        <button type="button" [disabled]="!result()" (click)="copy()">Copy</button>
       </div>
 
       <div class="result" *ngIf="result(); else nores">
@@ -33,12 +34,18 @@ import { CpfService } from '../../core/services/cpf.service';
       <h2>Validate / Format</h2>
       <div class="field">
         <label for="cpf">CPF</label>
-        <input id="cpf" name="cpf" [(ngModel)]="input" placeholder="type/paste here…" />
+        <input
+          id="cpf"
+          name="cpf"
+          [ngModel]="input()"
+          (ngModelChange)="input.set($event)"
+          placeholder="type/paste here…"
+        />
       </div>
       <div class="row">
-        <button (click)="format()">Format</button>
-        <button (click)="unformat()">Unformat</button>
-        <button (click)="clear()">Clear</button>
+        <button type="button" (click)="format()">Format</button>
+        <button type="button" (click)="unformat()">Unformat</button>
+        <button type="button" (click)="clear()">Clear</button>
         <span class="badge" [class.bad]="!valid()" [class.good]="valid()">
           {{ valid() ? 'Valid' : 'Invalid' }}
         </span>
@@ -136,14 +143,10 @@ export class CpfGeneratorComponent {
 
   result: WritableSignal<string> = signal('');
   copied = signal(false);
-  valid = signal(false);
-  input = '';
 
-  constructor() {
-    effect(() => {
-      this.valid.set(this.cpf.isValid(this.input));
-    });
-  }
+  input = signal('');
+
+  valid = computed(() => this.cpf.isValid(this.input()));
 
   gen(formatted: boolean) {
     this.result.set(this.cpf.generate({ formatted }));
@@ -160,17 +163,14 @@ export class CpfGeneratorComponent {
   }
 
   format() {
-    this.input = this.cpf.format(this.input);
-    this.valid.set(this.cpf.isValid(this.input));
+    this.input.set(this.cpf.format(this.input()));
   }
 
   unformat() {
-    this.input = this.cpf.unformat(this.input);
-    this.valid.set(this.cpf.isValid(this.input));
+    this.input.set(this.cpf.unformat(this.input()));
   }
 
   clear() {
-    this.input = '';
-    this.valid.set(false);
+    this.input.set('');
   }
 }
