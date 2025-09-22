@@ -1,1 +1,28 @@
-/* You can add global styles to this file, and also import other style files */
+@use 'sass:color';
+@use 'app/shared/styles/tokens' as *;
+
+:root {
+  --bg: #f8fafc;
+  --text: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+    'Apple Color Emoji', 'Segoe UI Emoji';
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  max-width: 960px;
+  margin: 24px auto;
+  padding: 0 16px;
+}

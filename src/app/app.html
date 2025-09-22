@@ -1,1 +1,17 @@
-<router-outlet />
+<header class="topbar">
+  <div class="brand">🛠️ Tools4Dev</div>
+  <nav class="nav">
+    <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+    <a routerLink="/cpf-generator" routerLinkActive="active">CPF Generator</a>
+    <a routerLink="/qr-code" routerLinkActive="active">QR Code</a>
+    <a routerLink="/url-shortener" routerLinkActive="active">URL Shortener</a>
+  </nav>
+</header>
+
+<main class="container">
+  <router-outlet />
+</main>
+
+<footer class="footer">
+  <small>© {{ year }} Tools4Dev</small>
+</footer>

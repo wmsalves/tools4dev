@@ -1,68 +1,67 @@
-import { Component, inject, signal, computed, WritableSignal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CpfService } from '../../core/services/cpf.service';
+import { Component, inject, signal, WritableSignal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CpfService } from '@app/core/services/cpf.service';
+import { ToolCardComponent } from '@shared/ui/tool-card/tool-card.component';
+import { ButtonComponent } from '@shared/ui/button/button.component';
+import { InputComponent } from '@shared/ui/input/input.component';
+import { BadgeComponent } from '@shared/ui/badge/badge.component';
+import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
 
 @Component({
   standalone: true,
   selector: 'app-cpf-generator',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ToolCardComponent, ButtonComponent, InputComponent, BadgeComponent],
   providers: [CpfService],
   template: `
-    <h1>CPF Generator</h1>
-    <p class="muted">
-      Generate valid CPFs for tests, format or validate an input, and copy to clipboard.
-    </p>
-
-    <section class="panel">
+    <tool-card
+      title="CPF Generator"
+      subtitle="Generate valid CPFs for tests, format or validate an input."
+      [hasActions]="true"
+    >
       <div class="row">
-        <button type="button" (click)="gen(true)">Generate (formatted)</button>
-        <button type="button" (click)="gen(false)">Generate (digits only)</button>
-        <button type="button" [disabled]="!result()" (click)="copy()">Copy</button>
+        <ui-button (click)="gen(true)">Generate (formatted)</ui-button>
+        <ui-button (click)="gen(false)" variant="outline">Generate (digits only)</ui-button>
+        <ui-button [disabled]="!result()" (click)="copy()">Copy</ui-button>
       </div>
 
       <div class="result" *ngIf="result(); else nores">
         <code>{{ result() }}</code>
-        <span class="ok" *ngIf="copied()">Copied!</span>
+        <ui-badge variant="success" *ngIf="copied()">Copied!</ui-badge>
       </div>
       <ng-template #nores>
         <div class="result muted">No CPF generated yet.</div>
       </ng-template>
-    </section>
 
-    <section class="panel">
-      <h2>Validate / Format</h2>
-      <div class="field">
-        <label for="cpf">CPF</label>
-        <input
+      <div class="hr"></div>
+
+      <div>
+        <ui-input
           id="cpf"
-          name="cpf"
-          [ngModel]="input()"
-          (ngModelChange)="input.set($event)"
+          label="Validate / Format"
           placeholder="type/paste here…"
-        />
+          [model]="input()"
+          [modelChange]="onInputChange"
+        ></ui-input>
       </div>
+
       <div class="row">
-        <button type="button" (click)="format()">Format</button>
-        <button type="button" (click)="unformat()">Unformat</button>
-        <button type="button" (click)="clear()">Clear</button>
-        <span class="badge" [class.bad]="!valid()" [class.good]="valid()">
+        <ui-button (click)="format()">Format</ui-button>
+        <ui-button (click)="unformat()" variant="ghost">Unformat</ui-button>
+        <ui-button (click)="clear()" variant="ghost">Clear</ui-button>
+        <ui-badge [variant]="valid() ? 'success' : 'danger'">
           {{ valid() ? 'Valid' : 'Invalid' }}
-        </span>
+        </ui-badge>
       </div>
-    </section>
+
+      <div actions>
+        <small class="muted">Tip: generated CPFs are for testing purposes only.</small>
+      </div>
+    </tool-card>
   `,
   styles: [
     `
       .muted {
         color: #6b7280;
-      }
-      .panel {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 16px;
-        margin: 16px 0;
       }
       .row {
         display: flex;
@@ -70,22 +69,8 @@ import { CommonModule } from '@angular/common';
         gap: 8px;
         flex-wrap: wrap;
       }
-      button {
-        appearance: none;
-        border: 1px solid #111827;
-        background: #111827;
-        color: #fff;
-        padding: 8px 12px;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-      }
-      button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
       .result {
-        margin-top: 12px;
+        margin-top: 4px;
         font-size: 14px;
         display: flex;
         align-items: center;
@@ -97,43 +82,10 @@ import { CommonModule } from '@angular/common';
         padding: 6px 10px;
         border-radius: 8px;
       }
-      .ok {
-        color: #16a34a;
-        font-weight: 600;
-      }
-      .field {
-        display: grid;
-        gap: 6px;
-        margin: 12px 0;
-      }
-      input {
-        padding: 10px 12px;
-        border-radius: 10px;
-        border: 1px solid #d1d5db;
-        outline: none;
-      }
-      input:focus {
-        border-color: #111827;
-      }
-      .badge {
-        display: inline-block;
-        border-radius: 999px;
-        padding: 6px 10px;
-        font-weight: 700;
-        font-size: 12px;
-        border: 1px solid #e5e7eb;
-        background: #f3f4f6;
-        color: #111827;
-      }
-      .badge.good {
-        border-color: #16a34a;
-        background: #ecfdf5;
-        color: #166534;
-      }
-      .badge.bad {
-        border-color: #dc2626;
-        background: #fef2f2;
-        color: #7f1d1d;
+      .hr {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 8px 0;
       }
     `,
   ],
@@ -143,23 +95,21 @@ export class CpfGeneratorComponent {
 
   result: WritableSignal<string> = signal('');
   copied = signal(false);
-
   input = signal('');
-
   valid = computed(() => this.cpf.isValid(this.input()));
+
+  onInputChange = (v: string) => this.input.set(v);
 
   gen(formatted: boolean) {
     this.result.set(this.cpf.generate({ formatted }));
     this.copied.set(false);
   }
 
-  copy() {
+  async copy() {
     const text = this.result();
     if (!text) return;
-    navigator.clipboard
-      ?.writeText(text)
-      .then(() => this.copied.set(true))
-      .catch(() => this.copied.set(false));
+    const ok = await copyToClipboard(text);
+    this.copied.set(ok);
   }
 
   format() {

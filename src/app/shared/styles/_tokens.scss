@@ -1,0 +1,22 @@
+/* Design tokens básicos (v0): cores, espaçamentos, raio, sombras */
+$color-bg: #0b1220;
+$color-surface: #ffffff;
+$color-border: #e5e7eb;
+$color-text: #0f172a;
+$color-muted: #6b7280;
+
+$color-primary: #111827;
+$color-primary-contrast: #ffffff;
+
+$color-success: #166534;
+$color-success-bg: #ecfdf5;
+$color-success-border: #16a34a;
+
+$color-danger: #7f1d1d;
+$color-danger-bg: #fef2f2;
+$color-danger-border: #dc2626;
+
+$radius-md: 12px;
+$radius-full: 999px;
+
+$shadow-card: 0 6px 20px rgba(0, 0, 0, 0.06);
