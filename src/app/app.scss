@@ -27,8 +27,30 @@
   text-decoration: underline;
 }
 
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0;
+  min-height: calc(100dvh - 58px - 64px); // header + footer approx
+}
+
+.content {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
 .footer {
   text-align: center;
   padding: 24px 0;
   color: #6b7280;
+}
+
+/* responsivo: esconde a sidebar em telas menores */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .hide-on-mobile {
+    display: none;
+  }
 }

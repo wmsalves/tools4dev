@@ -8,9 +8,14 @@
   </nav>
 </header>
 
-<main class="container">
-  <router-outlet />
-</main>
+<!-- layout com sidebar -->
+<div class="layout">
+  <app-sidebar class="hide-on-mobile"></app-sidebar>
+
+  <main class="content container">
+    <router-outlet />
+  </main>
+</div>
 
 <footer class="footer">
   <small>© {{ year }} Tools4Dev</small>
