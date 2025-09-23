@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { NgIf, NgComponentOutlet } from '@angular/common';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'tool-card',
   standalone: true,
-  imports: [NgIf, NgComponentOutlet],
+  imports: [NgIf],
   template: `
     <section class="card">
       <header class="card-hd" *ngIf="title || subtitle">

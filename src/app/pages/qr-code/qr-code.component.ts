@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, signal, effect } from '@angular/core';
+import { Component, ElementRef, ViewChild, signal, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -9,20 +9,14 @@ import { BadgeComponent } from '@shared/ui/badge/badge.component';
 
 import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
 import { downloadDataUrl } from '@shared/utils/download';
+import { ToastService } from '@app/shared/toast/toast.service';
 
 type Ecc = 'L' | 'M' | 'Q' | 'H';
 
 @Component({
   standalone: true,
   selector: 'app-qr-code',
-  imports: [
-    CommonModule,
-    FormsModule,
-    ToolCardComponent,
-    ButtonComponent,
-    InputComponent,
-    BadgeComponent,
-  ],
+  imports: [CommonModule, FormsModule, ToolCardComponent, InputComponent, ButtonComponent],
   template: `
     <tool-card
       title="QR Code Generator"
@@ -191,8 +185,8 @@ type Ecc = 'L' | 'M' | 'Q' | 'H';
 })
 export class QrCodeComponent {
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
+  private toast = inject(ToastService);
 
-  // state
   text = signal<string>('');
   size = signal<number>(256);
   margin = signal<number>(2);
@@ -202,7 +196,6 @@ export class QrCodeComponent {
   error = signal<string>('');
   status = signal<'Idle' | 'Ready' | 'Rendering'>('Idle');
 
-  // ngModel bridges
   sizeValue = this.size();
   marginValue = this.margin();
   eccValue: Ecc = this.ecc();
@@ -220,7 +213,6 @@ export class QrCodeComponent {
 
   constructor() {
     effect(() => {
-      // keep ngModel mirrors in sync if size/margin/ecc change from other places
       this.sizeValue = this.size();
       this.marginValue = this.margin();
       this.eccValue = this.ecc();
@@ -251,43 +243,46 @@ export class QrCodeComponent {
     this.status.set('Rendering');
 
     try {
-      // dynamic import avoids SSR bundling issues
-      // @ts-ignore: No type declarations for 'qrcode'
       const QRCode = (await import('qrcode')).default;
       const opts = {
         errorCorrectionLevel: this.ecc(),
         width: this.size(),
         margin: this.margin(),
-        // colors could be exposed later:
         color: { dark: '#000000', light: '#FFFFFF' },
       } as const;
 
       await QRCode.toCanvas(canvas, value, opts);
       this.dataUrl.set(canvas.toDataURL('image/png'));
       this.status.set('Ready');
+      this.toast.success('QR code generated');
     } catch (e: any) {
       this.status.set('Idle');
       this.dataUrl.set('');
-      this.error.set(e?.message ?? 'Failed to render QR code.');
+      const msg = e?.message ?? 'Failed to render QR code.';
+      this.error.set(msg);
+      this.toast.error(msg);
     }
   }
 
   async copyImage() {
     if (!this.dataUrl()) return;
     const ok = await copyToClipboard(this.dataUrl());
-    if (!ok) this.error.set('Could not copy image data URL to clipboard.');
+    ok
+      ? this.toast.success('Image data URL copied')
+      : this.toast.error('Could not copy image data URL');
   }
 
   async copyText() {
     const v = this.text().trim();
     if (!v) return;
     const ok = await copyToClipboard(v);
-    if (!ok) this.error.set('Could not copy text to clipboard.');
+    ok ? this.toast.success('Text copied') : this.toast.error('Could not copy text');
   }
 
   download() {
     if (!this.dataUrl()) return;
     downloadDataUrl(this.dataUrl(), 'qrcode.png');
+    this.toast.info('Downloading PNG…');
   }
 
   clear() {
@@ -298,5 +293,6 @@ export class QrCodeComponent {
     const canvas = this.canvasRef?.nativeElement;
     const ctx = canvas?.getContext('2d');
     if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    this.toast.info('Cleared');
   }
 }

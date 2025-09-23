@@ -6,6 +6,7 @@ import { ButtonComponent } from '@shared/ui/button/button.component';
 import { InputComponent } from '@shared/ui/input/input.component';
 import { BadgeComponent } from '@shared/ui/badge/badge.component';
 import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
+import { ToastService } from '@app/shared/toast/toast.service';
 
 @Component({
   standalone: true,
@@ -92,6 +93,7 @@ import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
 })
 export class CpfGeneratorComponent {
   private cpf = inject(CpfService);
+  private toast = inject(ToastService);
 
   result: WritableSignal<string> = signal('');
   copied = signal(false);
@@ -103,6 +105,7 @@ export class CpfGeneratorComponent {
   gen(formatted: boolean) {
     this.result.set(this.cpf.generate({ formatted }));
     this.copied.set(false);
+    this.toast.info('CPF generated');
   }
 
   async copy() {
@@ -110,17 +113,22 @@ export class CpfGeneratorComponent {
     if (!text) return;
     const ok = await copyToClipboard(text);
     this.copied.set(ok);
+    ok ? this.toast.success('Copied to clipboard') : this.toast.error('Failed to copy');
   }
 
   format() {
     this.input.set(this.cpf.format(this.input()));
+    this.toast.info('Formatted');
   }
 
   unformat() {
     this.input.set(this.cpf.unformat(this.input()));
+    this.toast.info('Unformatted');
   }
 
   clear() {
     this.input.set('');
+    this.copied.set(false);
+    this.toast.info('Cleared');
   }
 }
