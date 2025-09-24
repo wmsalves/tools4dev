@@ -23,5 +23,10 @@ export const routes: Routes = [
       import('./pages/url-shortener/url-shortener.component').then((m) => m.UrlShortenerComponent),
     title: 'Tools4Dev • URL Shortener',
   },
+  {
+    path: 'uuid',
+    loadComponent: () => import('./pages/uuid/uuid.component').then((m) => m.UuidComponent),
+    title: 'Tools4Dev • UUID Generator',
+  },
   { path: '**', redirectTo: '' },
 ];
