@@ -28,5 +28,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/uuid/uuid.component').then((m) => m.UuidComponent),
     title: 'Tools4Dev • UUID Generator',
   },
+  {
+    path: 'password',
+    loadComponent: () =>
+      import('./pages/password/password.component').then((m) => m.PasswordComponent),
+    title: 'Tools4Dev • Password Generator',
+  },
   { path: '**', redirectTo: '' },
 ];

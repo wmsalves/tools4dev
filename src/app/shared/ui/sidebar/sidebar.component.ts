@@ -8,7 +8,7 @@ type ToolCategory = { name: string; tools: ToolItem[] };
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [NgFor, NgIf, RouterLink, RouterLinkActive],
+  imports: [NgFor, RouterLink, RouterLinkActive],
   template: `
     <aside class="sb">
       <!-- Search -->
@@ -182,7 +182,7 @@ export class SidebarComponent {
         { name: 'CPF Generator', path: '/cpf-generator' },
         { name: 'QR Code Generator', path: '/qr-code' },
         { name: 'UUID Generator', path: '/uuid' },
-        { name: 'Password Generator', path: '/password', disabled: true },
+        { name: 'Password Generator', path: '/password' },
       ],
     },
     {
