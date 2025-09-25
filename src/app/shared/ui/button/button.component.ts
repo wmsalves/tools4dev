@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { NgClass } from '@angular/common';
 
-type BtnVariant = 'primary' | 'outline' | 'ghost' | 'success' | 'danger' | 'subtle';
+type BtnVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'success' | 'danger' | 'subtle';
 type BtnSize = 'sm' | 'md';
 
 @Component({
@@ -36,6 +36,7 @@ type BtnSize = 'sm' | 'md';
           background 0.12s ease, opacity 0.12s ease;
         box-shadow: 0 6px 26px rgba(2, 6, 23, 0.4);
         user-select: none;
+        line-height: 1;
       }
       .btn:hover {
         transform: translateY(-1px);
@@ -63,35 +64,45 @@ type BtnSize = 'sm' | 'md';
       .v-primary {
         color: var(--accent);
         border-color: rgba(46, 242, 123, 0.18);
-        background: linear-gradient(90deg, rgba(46, 242, 123, 0.08), rgba(126, 231, 255, 0.03));
+        background: linear-gradient(90deg, rgba(46, 242, 123, 0.1), rgba(126, 231, 255, 0.04));
       }
       .v-primary:hover {
-        border-color: rgba(46, 242, 123, 0.28);
+        border-color: rgba(46, 242, 123, 0.3);
+      }
+
+      /* NOVO: secondary = neutro escuro (quando não queremos “sumir” como ghost) */
+      .v-secondary {
+        color: var(--text);
+        border-color: rgba(255, 255, 255, 0.08);
+        background: rgba(0, 0, 0, 0.22);
+      }
+      .v-secondary:hover {
+        border-color: rgba(46, 242, 123, 0.22);
       }
 
       .v-outline {
         background: transparent;
         border-style: dashed;
-        border-color: rgba(255, 255, 255, 0.09);
+        border-color: rgba(255, 255, 255, 0.1);
         color: var(--text);
       }
       .v-outline:hover {
-        border-color: rgba(46, 242, 123, 0.28);
+        border-color: rgba(46, 242, 123, 0.26);
       }
 
       .v-ghost {
         background: transparent;
-        border-color: rgba(255, 255, 255, 0.05);
+        border-color: transparent;
         color: var(--muted);
       }
       .v-ghost:hover {
         color: var(--text);
-        border-color: rgba(46, 242, 123, 0.22);
+        border-color: rgba(46, 242, 123, 0.18);
       }
 
       .v-success {
         color: var(--accent);
-        border-color: rgba(46, 242, 123, 0.22);
+        border-color: rgba(46, 242, 123, 0.24);
         background: rgba(46, 242, 123, 0.08);
       }
       .v-danger {
@@ -111,7 +122,7 @@ type BtnSize = 'sm' | 'md';
         cursor: not-allowed;
         transform: none;
         box-shadow: none;
-        filter: grayscale(0.2);
+        filter: grayscale(0.1);
       }
     `,
   ],

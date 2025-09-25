@@ -26,19 +26,12 @@ import { FormsModule } from '@angular/forms';
         display: block;
         margin-bottom: 6px;
         font-size: 14px;
-        color: $color-muted;
       }
       .in {
         width: 100%;
         padding: 10px 12px;
         border-radius: $radius-md;
-        border: 1px solid $color-border;
         outline: none;
-        background: $color-surface;
-        color: $color-text;
-      }
-      .in:focus {
-        border-color: $color-text;
       }
     `,
   ],

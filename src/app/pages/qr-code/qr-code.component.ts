@@ -71,9 +71,9 @@ type Ecc = 'L' | 'M' | 'Q' | 'H';
             </div>
           </div>
 
-          <div class="row">
-            <ui-button (click)="render()">Generate</ui-button>
-            <ui-button variant="outline" (click)="clear()">Clear</ui-button>
+          <div class="btn-group">
+            <ui-button size="sm" (click)="render()">Generate</ui-button>
+            <ui-button size="sm" variant="secondary" (click)="clear()">Clear</ui-button>
             <ui-badge *ngIf="status()" [variant]="status() === 'Ready' ? 'success' : ''">{{
               status()
             }}</ui-badge>
@@ -85,12 +85,14 @@ type Ecc = 'L' | 'M' | 'Q' | 'H';
             <canvas #canvas width="{{ size() }}" height="{{ size() }}"></canvas>
           </div>
 
-          <div class="row">
-            <ui-button [disabled]="!dataUrl()" (click)="download()">Download PNG</ui-button>
-            <ui-button [disabled]="!dataUrl()" variant="ghost" (click)="copyImage()"
+          <div class="btn-group">
+            <ui-button size="sm" [disabled]="!dataUrl()" (click)="download()"
+              >Download PNG</ui-button
+            >
+            <ui-button size="sm" variant="secondary" [disabled]="!dataUrl()" (click)="copyImage()"
               >Copy Image (Data URL)</ui-button
             >
-            <ui-button [disabled]="!text()" variant="ghost" (click)="copyText()"
+            <ui-button size="sm" variant="ghost" [disabled]="!text()" (click)="copyText()"
               >Copy Text</ui-button
             >
           </div>

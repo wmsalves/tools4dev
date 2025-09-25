@@ -214,3 +214,13 @@ select:-webkit-autofill {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
   border-radius: 12px;
 }
+
+/* Button group: deixa botões adjacentes com espaçamento e cantos consistentes */
+.btn-group {
+  display: inline-flex;
+  gap: 8px; /* mantemos gap pequeno; evita “colados” em tema dark */
+}
+.btn-group > ui-button,
+.btn-group > button {
+  display: inline-block;
+}

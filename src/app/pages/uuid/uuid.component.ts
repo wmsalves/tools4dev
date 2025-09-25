@@ -13,21 +13,21 @@ import { ToastService } from '../../shared/toast/toast.service';
 @Component({
   standalone: true,
   selector: 'app-uuid',
-  imports: [CommonModule, FormsModule, ToolCardComponent, ButtonComponent, BadgeComponent],
+  imports: [CommonModule, FormsModule, ToolCardComponent, ButtonComponent],
   template: `
     <tool-card
       title="UUID Generator"
       subtitle="Generate RFC 4122 version 4 UUIDs for testing."
       [hasActions]="true"
     >
-      <div class="row">
-        <ui-button (click)="generateOne()">Generate</ui-button>
-        <ui-button [disabled]="!current()" (click)="copyCurrent()">Copy</ui-button>
-        <ui-badge *ngIf="currentValid()" variant="success">Valid v4</ui-badge>
-        <ui-badge *ngIf="current() && !currentValid()" variant="danger">Invalid</ui-badge>
+      <div class="btn-group">
+        <ui-button size="sm" (click)="generateOne()">Generate</ui-button>
+        <ui-button size="sm" variant="secondary" [disabled]="!current()" (click)="copyCurrent()"
+          >Copy</ui-button
+        >
       </div>
 
-      <div *ngIf="current(); else nores" class="result">
+      <div *ngIf="current(); else nores" class="result" style="margin-top:8px">
         <code class="code">{{ current() }}</code>
       </div>
       <ng-template #nores>
@@ -72,8 +72,14 @@ import { ToastService } from '../../shared/toast/toast.service';
             (ngModelChange)="setCount($event)"
           />
         </div>
-        <ui-button (click)="generateMany()">Generate list</ui-button>
-        <ui-button [disabled]="!list().length" (click)="copyList()">Copy list</ui-button>
+
+        <div class="btn-group">
+          <ui-button size="sm" (click)="generateMany()">Generate list</ui-button>
+          <ui-button size="sm" variant="secondary" [disabled]="!list().length" (click)="copyList()"
+            >Copy list</ui-button
+          >
+        </div>
+
         <span class="muted" *ngIf="list().length">({{ list().length }} items)</span>
       </div>
 
