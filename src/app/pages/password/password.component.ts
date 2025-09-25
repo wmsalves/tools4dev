@@ -13,24 +13,73 @@ import { ToastService } from '../../shared/toast/toast.service';
   selector: 'app-password',
   imports: [CommonModule, FormsModule, ToolCardComponent, ButtonComponent, BadgeComponent],
   template: `
-    <tool-card title="Password Generator" subtitle="Create secure passwords with custom rules." [hasActions]="true">
+    <tool-card
+      title="Password Generator"
+      subtitle="Create secure passwords with custom rules."
+      [hasActions]="true"
+    >
       <div class="row">
         <div class="field">
           <label for="len">Length</label>
-          <input id="len" type="number" min="4" max="128" step="1" [(ngModel)]="lenValue" (ngModelChange)="setLen($event)" />
+          <input
+            id="len"
+            type="number"
+            min="4"
+            max="128"
+            step="1"
+            [(ngModel)]="lenValue"
+            (ngModelChange)="setLen($event)"
+          />
         </div>
 
-        <label class="chk"><input type="checkbox" [(ngModel)]="useLowerValue" (ngModelChange)="setUseLower($event)" /> Lowercase (a–z)</label>
-        <label class="chk"><input type="checkbox" [(ngModel)]="useUpperValue" (ngModelChange)="setUseUpper($event)" /> Uppercase (A–Z)</label>
-        <label class="chk"><input type="checkbox" [(ngModel)]="useDigitsValue" (ngModelChange)="setUseDigits($event)" /> Digits (0–9)</label>
-        <label class="chk"><input type="checkbox" [(ngModel)]="useSymbolsValue" (ngModelChange)="setUseSymbols($event)" /> Symbols (!@#$…)</label>
-        <label class="chk"><input type="checkbox" [(ngModel)]="avoidAmbiguousValue" (ngModelChange)="setAvoidAmbiguous($event)" /> Avoid ambiguous (O0l1|I)</label>
+        <label class="chk"
+          ><input
+            type="checkbox"
+            [(ngModel)]="useLowerValue"
+            (ngModelChange)="setUseLower($event)"
+          />
+          Lowercase (a–z)</label
+        >
+        <label class="chk"
+          ><input
+            type="checkbox"
+            [(ngModel)]="useUpperValue"
+            (ngModelChange)="setUseUpper($event)"
+          />
+          Uppercase (A–Z)</label
+        >
+        <label class="chk"
+          ><input
+            type="checkbox"
+            [(ngModel)]="useDigitsValue"
+            (ngModelChange)="setUseDigits($event)"
+          />
+          Digits (0–9)</label
+        >
+        <label class="chk"
+          ><input
+            type="checkbox"
+            [(ngModel)]="useSymbolsValue"
+            (ngModelChange)="setUseSymbols($event)"
+          />
+          Symbols (!@#$…)</label
+        >
+        <label class="chk"
+          ><input
+            type="checkbox"
+            [(ngModel)]="avoidAmbiguousValue"
+            (ngModelChange)="setAvoidAmbiguous($event)"
+          />
+          Avoid ambiguous (O0l1|I)</label
+        >
       </div>
 
       <div class="row">
         <ui-button (click)="generateOne()">Generate</ui-button>
         <ui-button [disabled]="!current()" (click)="copy()">Copy</ui-button>
-        <ui-badge *ngIf="current()" [variant]="strengthBadgeVariant()">{{ strengthLabel() }}</ui-badge>
+        <ui-badge *ngIf="current()" [variant]="strengthBadgeVariant()">{{
+          strengthLabel()
+        }}</ui-badge>
       </div>
 
       <div *ngIf="current(); else nores" class="result">
@@ -49,37 +98,107 @@ import { ToastService } from '../../shared/toast/toast.service';
       <div class="row">
         <div class="field">
           <label for="count">Count</label>
-          <input id="count" type="number" min="1" max="500" step="1" [(ngModel)]="countValue" (ngModelChange)="setCount($event)" />
+          <input
+            id="count"
+            type="number"
+            min="1"
+            max="500"
+            step="1"
+            [(ngModel)]="countValue"
+            (ngModelChange)="setCount($event)"
+          />
         </div>
         <ui-button (click)="generateMany()">Generate list</ui-button>
         <ui-button [disabled]="!list().length" (click)="copyList()">Copy list</ui-button>
         <span class="muted" *ngIf="list().length">({{ list().length }} items)</span>
       </div>
 
-      <pre *ngIf="list().length" class="list">{{ list().join('\n') }}</pre>
+      <pre *ngIf="list().length" class="list">{{
+        list().join(
+          '
+'
+        )
+      }}</pre>
 
       <div actions>
-        <small class="muted">Passwords are generated client-side using secure random when available.</small>
+        <small class="muted"
+          >Passwords are generated client-side using secure random when available.</small
+        >
       </div>
     </tool-card>
   `,
-  styles: [`
-    .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .field { display: grid; gap: 6px; }
-    .field input {
-      padding: 10px 12px; border-radius: 12px; border: 1px solid #e5e7eb; outline: none; background: #fff; width: 120px;
-    }
-    .field input:focus { border-color: #0f172a; }
-    .chk { display: inline-flex; gap: 8px; align-items: center; }
-    .result { margin-top: 4px; }
-    .code { background: #0b1220; color: #e5e7eb; padding: 6px 10px; border-radius: 8px; display: inline-block; }
-    .muted { color: #6b7280; }
-    .hr { height: 1px; background: #e5e7eb; margin: 8px 0; }
-    .list { max-height: 300px; overflow: auto; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; }
+  styles: [
+    `
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+      .field input {
+        background: rgba(0, 0, 0, 0.18);
+        border-color: rgba(255, 255, 255, 0.06);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 10px 12px;
+        border: 1px solid #e5e7eb;
+        outline: none;
+        width: 120px;
+      }
+      .field input:focus {
+        border-color: #0f172a;
+      }
+      .chk {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .result {
+        margin-top: 4px;
+      }
+      .code {
+        background: #0b1220;
+        color: #e5e7eb;
+        padding: 6px 10px;
+        border-radius: 8px;
+        display: inline-block;
+      }
+      .muted {
+        color: #6b7280;
+      }
+      .hr {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 8px 0;
+      }
+      .list {
+        max-height: 300px;
+        overflow: auto;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 12px;
+      }
 
-    .meter { height: 8px; background: #e5e7eb; border-radius: 999px; overflow: hidden; margin-top: 8px; width: 280px; max-width: 100%; }
-    .bar { height: 100%; background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e); }
-  `]
+      .meter {
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 999px;
+        overflow: hidden;
+        margin-top: 8px;
+        width: 280px;
+        max-width: 100%;
+      }
+      .bar {
+        height: 100%;
+        background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e);
+      }
+    `,
+  ],
 })
 export class PasswordComponent {
   private toast = new ToastService();
@@ -105,22 +224,45 @@ export class PasswordComponent {
   avoidAmbiguousValue = this.avoidAmbiguous();
   countValue = this.count();
 
-  setLen(v: number) { this.len.set(this.clamp(+v, 4, 128)); this.lenValue = this.len(); }
-  setUseLower(v: boolean) { this.useLower.set(!!v); this.useLowerValue = this.useLower(); }
-  setUseUpper(v: boolean) { this.useUpper.set(!!v); this.useUpperValue = this.useUpper(); }
-  setUseDigits(v: boolean) { this.useDigits.set(!!v); this.useDigitsValue = this.useDigits(); }
-  setUseSymbols(v: boolean) { this.useSymbols.set(!!v); this.useSymbolsValue = this.useSymbols(); }
-  setAvoidAmbiguous(v: boolean) { this.avoidAmbiguous.set(!!v); this.avoidAmbiguousValue = this.avoidAmbiguous(); }
-  setCount(v: number) { this.count.set(this.clamp(Math.floor(+v || 0), 1, 500)); this.countValue = this.count(); }
+  setLen(v: number) {
+    this.len.set(this.clamp(+v, 4, 128));
+    this.lenValue = this.len();
+  }
+  setUseLower(v: boolean) {
+    this.useLower.set(!!v);
+    this.useLowerValue = this.useLower();
+  }
+  setUseUpper(v: boolean) {
+    this.useUpper.set(!!v);
+    this.useUpperValue = this.useUpper();
+  }
+  setUseDigits(v: boolean) {
+    this.useDigits.set(!!v);
+    this.useDigitsValue = this.useDigits();
+  }
+  setUseSymbols(v: boolean) {
+    this.useSymbols.set(!!v);
+    this.useSymbolsValue = this.useSymbols();
+  }
+  setAvoidAmbiguous(v: boolean) {
+    this.avoidAmbiguous.set(!!v);
+    this.avoidAmbiguousValue = this.avoidAmbiguous();
+  }
+  setCount(v: number) {
+    this.count.set(this.clamp(Math.floor(+v || 0), 1, 500));
+    this.countValue = this.count();
+  }
 
-  strengthBits = computed(() => estimateEntropyBits({
-    len: this.len(),
-    lower: this.useLower(),
-    upper: this.useUpper(),
-    digits: this.useDigits(),
-    symbols: this.useSymbols(),
-    avoidAmbiguous: this.avoidAmbiguous(),
-  }));
+  strengthBits = computed(() =>
+    estimateEntropyBits({
+      len: this.len(),
+      lower: this.useLower(),
+      upper: this.useUpper(),
+      digits: this.useDigits(),
+      symbols: this.useSymbols(),
+      avoidAmbiguous: this.avoidAmbiguous(),
+    })
+  );
   strengthPct = computed(() => Math.max(0, Math.min(100, Math.round(this.strengthBits() / 1.2)))); // mapeia ~120 bits => 100%
   strengthLabel = computed(() => {
     const b = this.strengthBits();
@@ -129,7 +271,9 @@ export class PasswordComponent {
     if (b < 80) return 'Good';
     return 'Strong';
   });
-  strengthBadgeVariant = computed(() => this.strengthLabel() === 'Weak' ? 'danger' : (this.strengthLabel() === 'Fair' ? '' : 'success'));
+  strengthBadgeVariant = computed(() =>
+    this.strengthLabel() === 'Weak' ? 'danger' : this.strengthLabel() === 'Fair' ? '' : 'success'
+  );
 
   generateOne() {
     const { len, lower, upper, digits, symbols, avoidAmbiguous } = this.getCfg();
@@ -145,7 +289,9 @@ export class PasswordComponent {
   copy() {
     const v = this.current();
     if (!v) return;
-    copyToClipboard(v).then(ok => ok ? this.toast.success('Copied password') : this.toast.error('Copy failed'));
+    copyToClipboard(v).then((ok) =>
+      ok ? this.toast.success('Copied password') : this.toast.error('Copy failed')
+    );
   }
 
   generateMany() {
@@ -158,7 +304,9 @@ export class PasswordComponent {
   copyList() {
     const text = this.list().join('\n');
     if (!text) return;
-    copyToClipboard(text).then(ok => ok ? this.toast.success('List copied') : this.toast.error('Copy failed'));
+    copyToClipboard(text).then((ok) =>
+      ok ? this.toast.success('List copied') : this.toast.error('Copy failed')
+    );
   }
 
   private getCfg() {
@@ -200,7 +348,7 @@ function secureRandomInt(maxExclusive: number): number {
     const a = new Uint32Array(1);
     crypto.getRandomValues(a);
     // rejeição para evitar bias
-    const limit = Math.floor(0xFFFFFFFF / maxExclusive) * maxExclusive;
+    const limit = Math.floor(0xffffffff / maxExclusive) * maxExclusive;
     let x = a[0];
     while (x >= limit) {
       crypto.getRandomValues(a);
@@ -215,7 +363,13 @@ function pickFrom(chars: string): string {
   return chars[secureRandomInt(chars.length)];
 }
 
-function buildAlphabet({ lower, upper, digits, symbols, avoidAmbiguous }: Omit<GenCfg, 'len'>): string {
+function buildAlphabet({
+  lower,
+  upper,
+  digits,
+  symbols,
+  avoidAmbiguous,
+}: Omit<GenCfg, 'len'>): string {
   let pool = '';
   if (lower) pool += LOWER;
   if (upper) pool += UPPER;
@@ -224,7 +378,9 @@ function buildAlphabet({ lower, upper, digits, symbols, avoidAmbiguous }: Omit<G
   if (!pool) throw new Error('Select at least one character set');
 
   if (avoidAmbiguous) {
-    pool = Array.from(pool).filter(ch => !AMBIGUOUS.has(ch)).join('');
+    pool = Array.from(pool)
+      .filter((ch) => !AMBIGUOUS.has(ch))
+      .join('');
   }
   if (!pool) throw new Error('Character pool empty after removing ambiguous characters');
 
@@ -237,10 +393,22 @@ function generatePassword(cfg: GenCfg): string {
 
   // garanta ao menos 1 de cada conjunto selecionado
   const required: string[] = [];
-  if (lower) required.push(pickFrom(buildAlphabet({ ...cfg, lower: true, upper: false, digits: false, symbols: false })));
-  if (upper) required.push(pickFrom(buildAlphabet({ ...cfg, lower: false, upper: true, digits: false, symbols: false })));
-  if (digits) required.push(pickFrom(buildAlphabet({ ...cfg, lower: false, upper: false, digits: true, symbols: false })));
-  if (symbols) required.push(pickFrom(buildAlphabet({ ...cfg, lower: false, upper: false, digits: false, symbols: true })));
+  if (lower)
+    required.push(
+      pickFrom(buildAlphabet({ ...cfg, lower: true, upper: false, digits: false, symbols: false }))
+    );
+  if (upper)
+    required.push(
+      pickFrom(buildAlphabet({ ...cfg, lower: false, upper: true, digits: false, symbols: false }))
+    );
+  if (digits)
+    required.push(
+      pickFrom(buildAlphabet({ ...cfg, lower: false, upper: false, digits: true, symbols: false }))
+    );
+  if (symbols)
+    required.push(
+      pickFrom(buildAlphabet({ ...cfg, lower: false, upper: false, digits: false, symbols: true }))
+    );
 
   if (required.length > len) throw new Error('Length too small for selected constraints');
 

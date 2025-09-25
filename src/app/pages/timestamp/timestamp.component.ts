@@ -153,11 +153,14 @@ type Unit = 'seconds' | 'milliseconds';
         gap: 6px;
       }
       .field input {
-        padding: 10px 12px;
+        background: rgba(0, 0, 0, 0.18);
+        border-color: rgba(255, 255, 255, 0.06);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
         border-radius: 12px;
+        padding: 10px 12px;
+        width: 120px;
         border: 1px solid #e5e7eb;
         outline: none;
-        background: #fff;
         min-width: 240px;
       }
       .field input:focus {
