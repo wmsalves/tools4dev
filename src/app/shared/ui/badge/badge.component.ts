@@ -11,24 +11,22 @@ import { NgClass } from '@angular/common';
       @use '../../styles/tokens' as *;
 
       .badge {
-        display: inline-block;
-        border-radius: $radius-full;
+        background: rgba(0, 0, 0, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        color: var(--accent-2);
         padding: 6px 10px;
+        border-radius: 999px;
         font-weight: 700;
-        font-size: 12px;
-        border: 1px solid $color-border;
-        background: #f3f4f6;
-        color: $color-text;
       }
-      .success {
-        border-color: $color-success-border;
-        background: $color-success-bg;
-        color: $color-success;
+      .badge.success {
+        background: rgba(46, 242, 123, 0.08);
+        color: var(--accent);
+        border-color: rgba(46, 242, 123, 0.12);
       }
-      .danger {
-        border-color: $color-danger-border;
-        background: $color-danger-bg;
-        color: $color-danger;
+      .badge.danger {
+        background: rgba(255, 107, 107, 0.06);
+        color: #ffb3b3;
+        border-color: rgba(255, 107, 107, 0.12);
       }
     `,
   ],

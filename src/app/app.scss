@@ -1,29 +1,33 @@
-@use './shared/styles/tokens' as *;
+/* src/app/app.scss */
+@use 'app/shared/styles/tokens' as tokens;
 
 .topbar {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 40;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  background: #111827;
-  color: #fff;
-  border-bottom: 1px solid #2d3340;
+  padding: 12px 18px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.25));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(4px);
 }
 .brand {
   font-weight: 700;
-  letter-spacing: 0.3px;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
 }
 .nav a {
-  color: #cbd5e1;
-  margin-left: 16px;
-  text-decoration: none;
-  font-weight: 500;
+  color: #9fb7b2;
+  margin-left: 18px;
+  font-weight: 600;
 }
 .nav a.active {
-  color: #ffffff;
+  color: var(--accent);
   text-decoration: underline;
 }
 
@@ -31,23 +35,16 @@
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 0;
-  min-height: calc(100dvh - 58px - 64px); // header + footer aprox.
+  min-height: calc(100dvh - 58px - 64px);
 }
 
 .content {
-  padding-top: 16px;
-  padding-bottom: 16px;
+  padding: 20px 0;
 }
 
 .footer {
   text-align: center;
   padding: 24px 0;
-  color: #6b7280;
-}
-
-/* Responsivo: em telas estreitas, empilha a sidebar acima do conteúdo */
-@media (max-width: 900px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
+  color: var(--muted);
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
 }

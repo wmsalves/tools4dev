@@ -20,34 +20,17 @@ import { NgIf } from '@angular/common';
       @use '../../styles/tokens' as *;
 
       .card {
-        background: $color-surface;
-        border: 1px solid $color-border;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(0, 0, 0, 0.03));
+        border: 1px solid rgba(255, 255, 255, 0.03);
         border-radius: $radius-md;
         padding: 16px;
+        box-shadow: $shadow-soft;
       }
-      .card + .card {
-        margin-top: 16px;
+      .card-hd .ttl {
+        color: var(--accent);
       }
-      .card-hd {
-        margin-bottom: 12px;
-      }
-      .ttl {
-        margin: 0 0 6px 0;
-        font-size: 18px;
-      }
-      .sub {
-        margin: 0;
-        color: $color-muted;
-      }
-      .card-body {
-        display: grid;
-        gap: 12px;
-      }
-      .card-ft {
-        margin-top: 10px;
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
+      .card .sub {
+        color: var(--muted);
       }
     `,
   ],
