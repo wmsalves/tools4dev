@@ -189,7 +189,7 @@ export class SidebarComponent {
       name: 'Utilities',
       tools: [
         { name: 'URL Shortener', path: '/url-shortener' },
-        { name: 'Timestamp Converter', path: '/timestamp', disabled: true },
+        { name: 'Timestamp Converter', path: '/timestamp' },
         { name: 'Regex Tester', path: '/regex', disabled: true },
       ],
     },

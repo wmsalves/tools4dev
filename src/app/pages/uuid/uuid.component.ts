@@ -13,14 +13,7 @@ import { ToastService } from '../../shared/toast/toast.service';
 @Component({
   standalone: true,
   selector: 'app-uuid',
-  imports: [
-    CommonModule,
-    FormsModule,
-    ToolCardComponent,
-    ButtonComponent,
-    InputComponent,
-    BadgeComponent,
-  ],
+  imports: [CommonModule, FormsModule, ToolCardComponent, ButtonComponent, BadgeComponent],
   template: `
     <tool-card
       title="UUID Generator"

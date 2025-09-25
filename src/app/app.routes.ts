@@ -34,5 +34,11 @@ export const routes: Routes = [
       import('./pages/password/password.component').then((m) => m.PasswordComponent),
     title: 'Tools4Dev • Password Generator',
   },
+  {
+    path: 'timestamp',
+    loadComponent: () =>
+      import('./pages/timestamp/timestamp.component').then((m) => m.TimestampComponent),
+    title: 'Tools4Dev • Timestamp Converter',
+  },
   { path: '**', redirectTo: '' },
 ];
