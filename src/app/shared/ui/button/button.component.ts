@@ -46,7 +46,6 @@ type BtnSize = 'sm' | 'md';
         transform: translateY(0);
       }
 
-      /* sizes */
       .s-sm {
         padding: 6px 10px;
         font-size: 12px;
@@ -60,7 +59,6 @@ type BtnSize = 'sm' | 'md';
         width: 100%;
       }
 
-      /* variants */
       .v-primary {
         color: var(--accent);
         border-color: rgba(46, 242, 123, 0.18);
@@ -70,7 +68,6 @@ type BtnSize = 'sm' | 'md';
         border-color: rgba(46, 242, 123, 0.3);
       }
 
-      /* NOVO: secondary = neutro escuro (quando não queremos “sumir” como ghost) */
       .v-secondary {
         color: var(--text);
         border-color: rgba(255, 255, 255, 0.08);
@@ -116,7 +113,6 @@ type BtnSize = 'sm' | 'md';
         background: rgba(0, 0, 0, 0.18);
       }
 
-      /* disabled */
       .btn:disabled {
         opacity: 0.45;
         cursor: not-allowed;
