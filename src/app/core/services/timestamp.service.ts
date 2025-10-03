@@ -28,7 +28,11 @@ export class TimestampService {
     if (autoDetect && isLikelyMs) {
       ms = Math.trunc(n);
     } else {
-      ms = unit === 'seconds' ? n * 1000 : n;
+      ms = unit === 'seconds' ? n * 1000 : Math.trunc(n);
+    }
+
+    if (unit === 'seconds') {
+      ms = Math.round(ms);
     }
 
     if (!Number.isFinite(ms) || Math.abs(ms) > 8.64e15) {
@@ -53,16 +57,20 @@ export class TimestampService {
 
   formatMs(ms: number | null, format: 'local' | 'utc' | 'iso'): string {
     if (ms === null) return '';
-    const date = new Date(ms);
-    switch (format) {
-      case 'local':
-        return date.toLocaleString();
-      case 'utc':
-        return date.toUTCString();
-      case 'iso':
-        return date.toISOString();
-      default:
-        return '';
+    try {
+      const date = new Date(ms);
+      switch (format) {
+        case 'local':
+          return date.toLocaleString();
+        case 'utc':
+          return date.toUTCString();
+        case 'iso':
+          return date.toISOString();
+        default:
+          return '';
+      }
+    } catch {
+      return 'Invalid Date';
     }
   }
 
@@ -84,6 +92,6 @@ export class TimestampService {
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
       d.getHours()
-    )}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    )}:${pad(d.getMinutes())}`;
   }
 }

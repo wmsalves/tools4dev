@@ -1,17 +1,17 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-import { ToolCardComponent } from '../../shared/ui/tool-card/tool-card.component';
-import { ButtonComponent } from '../../shared/ui/button/button.component';
-import { copyToClipboard } from '../../shared/utils/copy-to-clipboard';
-import { ToastService } from '../../shared/toast/toast.service';
 import { TimestampService, Unit } from '@app/core/services/timestamp.service';
+import { ToolCardComponent } from '@shared/ui/tool-card/tool-card.component';
+import { ButtonComponent } from '@shared/ui/button/button.component';
+import { BadgeComponent } from '@shared/ui/badge/badge.component';
+import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
+import { ToastService } from '@app/shared/toast/toast.service';
 
 @Component({
   standalone: true,
   selector: 'app-timestamp',
-  imports: [CommonModule, FormsModule, ToolCardComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, ToolCardComponent, ButtonComponent, BadgeComponent],
   template: `
     <tool-card
       title="Timestamp Converter"
@@ -20,147 +20,150 @@ import { TimestampService, Unit } from '@app/core/services/timestamp.service';
     >
       <!-- Epoch -> Local -->
       <h3>Epoch → Local</h3>
-      <div class="row">
-        <div class="field">
-          <label for="epoch">Epoch</label>
-          <input
-            id="epoch"
-            type="text"
-            placeholder="e.g. 1732567890 or 1732567890123"
-            [(ngModel)]="epochInput"
-          />
-        </div>
-
-        <div class="field">
-          <label>Unit</label>
-          <div class="inline">
-            <label class="chk">
-              <input type="radio" name="u1" value="seconds" [(ngModel)]="unit" />
-              Seconds
-            </label>
-            <label class="chk">
-              <input type="radio" name="u1" value="milliseconds" [(ngModel)]="unit" />
-              Milliseconds
-            </label>
+      <div class="form-group">
+        <div class="form-row">
+          <div class="field">
+            <label for="epoch">Epoch</label>
+            <input
+              id="epoch"
+              type="text"
+              placeholder="e.g. 1732567890 or 1732567890123"
+              [(ngModel)]="epochInput"
+            />
+          </div>
+          <div class="field">
+            <label>Unit</label>
+            <div class="radio-group">
+              <label
+                ><input type="radio" name="u1" value="seconds" [(ngModel)]="unit" /> Seconds</label
+              >
+              <label
+                ><input type="radio" name="u1" value="milliseconds" [(ngModel)]="unit" />
+                Milliseconds</label
+              >
+            </div>
           </div>
         </div>
-
-        <label
-          class="chk"
-          title="If on, large numbers (>= 1e12) are treated as milliseconds even if 'Seconds' is selected."
-        >
-          <input type="checkbox" [(ngModel)]="autoDetect" />
-          Auto-detect ms
-        </label>
+        <div class="form-row">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="autoDetect" />
+            Auto-detect ms
+          </label>
+        </div>
       </div>
-
-      <div class="row info-row">
-        <div class="info">
-          <div><strong>Local:</strong> {{ localOut() || '—' }}</div>
-          <div><strong>UTC:</strong> {{ utcOut() || '—' }}</div>
-          <div class="small muted" *ngIf="isoOut()">
-            ISO (UTC): <code class="code">{{ isoOut() }}</code>
-          </div>
-          <div class="err" *ngIf="epochError()">{{ epochError() }}</div>
+      <div class="info-box">
+        <div><strong>Local:</strong> {{ localOut() || '—' }}</div>
+        <div><strong>UTC:</strong> {{ utcOut() || '—' }}</div>
+        <div class="small muted" *ngIf="isoOut()">
+          ISO (UTC): <code class="code">{{ isoOut() }}</code>
         </div>
-        <div class="btn-group">
-          <ui-button size="sm" variant="ghost" (click)="copy(isoOut())" [disabled]="!isoOut()"
-            >Copy ISO</ui-button
-          >
-          <ui-button size="sm" variant="ghost" (click)="copy(utcOut())" [disabled]="!utcOut()"
-            >Copy UTC</ui-button
-          >
-          <ui-button size="sm" variant="ghost" (click)="copy(localOut())" [disabled]="!localOut()"
-            >Copy Local</ui-button
-          >
-        </div>
+        <div class="err" *ngIf="errorMsg()">{{ errorMsg() }}</div>
       </div>
 
       <div class="hr"></div>
 
       <!-- Local -> Epoch -->
       <h3>Local → Epoch</h3>
-      <div class="row">
-        <div class="field">
-          <label for="dt">Local date/time</label>
-          <input id="dt" type="datetime-local" step="1" [(ngModel)]="localInput" />
+      <div class="form-group">
+        <div class="form-row">
+          <div class="field">
+            <label for="dt">Local date/time</label>
+            <input id="dt" type="datetime-local" [(ngModel)]="localInput" />
+          </div>
+          <div class="field">
+            <label>Unit</label>
+            <div class="radio-group">
+              <label
+                ><input type="radio" name="u2" value="seconds" [(ngModel)]="unit" /> Seconds</label
+              >
+              <label
+                ><input type="radio" name="u2" value="milliseconds" [(ngModel)]="unit" />
+                Milliseconds</label
+              >
+            </div>
+          </div>
         </div>
-
-        <div class="btn-group">
-          <ui-button size="sm" (click)="setNow()">Now</ui-button>
-          <ui-button
-            size="sm"
-            variant="secondary"
-            (click)="copy(epochFromLocal())"
-            [disabled]="!epochFromLocal()"
-            >Copy Epoch</ui-button
-          >
-          <ui-button size="sm" variant="ghost" (click)="clearLocal()" [disabled]="!localInput()"
-            >Clear</ui-button
-          >
+        <div class="form-row">
+          <div class="btn-group">
+            <ui-button (click)="setNow()">Now</ui-button>
+            <ui-button
+              variant="secondary"
+              (click)="copyEpochFromLocal()"
+              [disabled]="epochFromLocal() == null"
+              >Copy Epoch</ui-button
+            >
+          </div>
         </div>
       </div>
-
-      <div class="row info-row">
-        <div class="info">
-          <div>
-            <strong>Epoch:</strong>
-            <code class="code">{{ epochFromLocal() ?? '—' }}</code>
-          </div>
-          <div class="muted small">TZ offset: {{ tzOffsetStr }}</div>
+      <div class="info-box">
+        <div>
+          <strong>Epoch:</strong>
+          <code class="code">{{ epochFromLocal() ?? '—' }}</code>
+          <ui-badge *ngIf="epochFromLocal() != null" variant="success">{{ unit() }}</ui-badge>
         </div>
+        <div class="muted small">TZ offset: {{ tzOffsetStr() }}</div>
       </div>
 
       <div actions>
         <small class="muted">
-          When “Auto-detect ms” is on, large numbers (≥ 1e12) are treated as milliseconds.
+          When “Auto-detect ms” is on, long numbers (≥ 1e12) are treated as milliseconds.
         </small>
       </div>
     </tool-card>
   `,
   styles: [
     `
+      /* --- Estrutura de Layout do Formulário --- */
       h3 {
         margin-bottom: 12px;
       }
-      .row {
+      .form-group {
         display: flex;
-        align-items: center;
+        flex-direction: column;
         gap: 16px;
-        flex-wrap: wrap;
       }
-      .info-row {
-        align-items: flex-start;
-        justify-content: space-between;
-        margin-top: 12px;
-        min-height: 90px;
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 20px;
       }
       .field {
-        display: grid;
-        gap: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1 1 200px; /* Allow fields to grow and shrink */
       }
-      .field input {
-        min-width: 280px;
-      }
-      .inline {
+      .radio-group,
+      .checkbox-label {
         display: flex;
         gap: 16px;
         align-items: center;
+        height: 41px; /* Match input height */
       }
-      .chk {
+      .radio-group label,
+      .checkbox-label {
         display: inline-flex;
-        gap: 6px;
         align-items: center;
+        gap: 6px;
         color: var(--muted);
-        user-select: none;
+        cursor: pointer;
       }
-      .hr {
-        height: 1px;
-        background: rgba(255, 255, 255, 0.05);
-        margin: 24px 0;
+      .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
       }
-      .info {
-        display: grid;
+
+      /* --- Estilos Visuais --- */
+      .info-box {
+        margin-top: 16px;
+        padding: 12px;
+        border: 1px solid var(--glass);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
         gap: 8px;
       }
       .muted {
@@ -174,53 +177,74 @@ import { TimestampService, Unit } from '@app/core/services/timestamp.service';
         color: var(--accent-2);
         padding: 4px 8px;
         border-radius: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass);
       }
       .err {
         color: #ffb3b3;
-        font-weight: 500;
+        background: rgba(255, 107, 107, 0.08);
+        border: 1px solid rgba(255, 107, 107, 0.24);
+        padding: 8px 12px;
+        border-radius: 10px;
+      }
+      .hr {
+        height: 1px;
+        background: var(--glass);
+        margin: 24px 0;
+        border: none;
       }
     `,
   ],
 })
 export class TimestampComponent {
   private toast = inject(ToastService);
-  private tsService = inject(TimestampService);
+  private timestampService = inject(TimestampService);
 
-  // UI state signals
-  epochInput = signal('');
-  localInput = signal('');
+  // state
+  epochInput = signal<string>('');
+  localInput = signal<string>('');
   unit = signal<Unit>('seconds');
-  autoDetect = signal(true);
+  autoDetect = signal<boolean>(true);
+  errorMsg = signal<string>('');
 
-  // === Epoch -> Local Derived State ===
-  private epochConversion = computed(() =>
-    this.tsService.parseEpoch(this.epochInput(), this.unit(), this.autoDetect())
-  );
-  private parsedEpochMs = computed(() => this.epochConversion().ms);
-  epochError = computed(() => this.epochConversion().error);
+  // Epoch -> Local conversion
+  private parsedEpoch = computed(() => {
+    this.errorMsg.set('');
+    // Corrigido: passando 3 argumentos em vez de 2
+    const result = this.timestampService.parseEpoch(
+      this.epochInput(),
+      this.unit(),
+      this.autoDetect()
+    );
+    if (result.error) {
+      this.errorMsg.set(result.error);
+    }
+    return result.ms;
+  });
 
-  localOut = computed(() => this.tsService.formatMs(this.parsedEpochMs(), 'local'));
-  utcOut = computed(() => this.tsService.formatMs(this.parsedEpochMs(), 'utc'));
-  isoOut = computed(() => this.tsService.formatMs(this.parsedEpochMs(), 'iso'));
+  // Corrigido: 'format' renomeado para 'formatMs'
+  localOut = computed(() => this.timestampService.formatMs(this.parsedEpoch(), 'local'));
+  utcOut = computed(() => this.timestampService.formatMs(this.parsedEpoch(), 'utc'));
+  isoOut = computed(() => this.timestampService.formatMs(this.parsedEpoch(), 'iso'));
 
-  // === Local -> Epoch Derived State ===
-  private parsedLocalMs = computed(() => this.tsService.parseLocalDateTime(this.localInput()));
-  epochFromLocal = computed(() => this.tsService.msToEpoch(this.parsedLocalMs(), this.unit()));
-  tzOffsetStr = this.tsService.getTimezoneOffsetString();
+  // Local -> Epoch conversion
+  // Corrigido: 'fromLocal' agora existe no serviço
+  epochFromLocal = computed(() => {
+    const ms = this.timestampService.parseLocalDateTime(this.localInput());
+    return this.timestampService.msToEpoch(ms, this.unit());
+  });
+  // Corrigido: 'getTimezoneOffset' renomeado para 'getTimezoneOffsetString'
+  tzOffsetStr = computed(() => this.timestampService.getTimezoneOffsetString());
 
-  // === Actions ===
+  // actions
   setNow() {
-    this.localInput.set(this.tsService.toDatetimeLocalValue(new Date()));
+    // Corrigido: 'getNowAsLocalString' agora existe no serviço
+    this.localInput.set(this.timestampService.toDatetimeLocalValue(new Date()));
   }
 
-  clearLocal() {
-    this.localInput.set('');
-  }
-
-  async copy(value: string | null) {
-    if (!value) return;
-    const ok = await copyToClipboard(value);
-    ok ? this.toast.success('Copied to clipboard') : this.toast.error('Copy failed');
+  async copyEpochFromLocal() {
+    const v = this.epochFromLocal();
+    if (v == null) return;
+    const ok = await copyToClipboard(String(v));
+    ok ? this.toast.success('Epoch copied') : this.toast.error('Copy failed');
   }
 }
