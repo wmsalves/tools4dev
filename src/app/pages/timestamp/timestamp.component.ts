@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TimestampService, Unit } from '@app/core/services/timestamp.service';
@@ -14,8 +14,8 @@ import { ToastService } from '@app/shared/toast/toast.service';
   imports: [CommonModule, FormsModule, ToolCardComponent, ButtonComponent, BadgeComponent],
   template: `
     <tool-card
-      title="Timestamp Converter"
-      subtitle="Convert between Unix epoch and local date/time."
+      [title]="'Timestamp Converter'"
+      [subtitle]="'Convert between Unix epoch and local date/time.'"
       [hasActions]="true"
     >
       <!-- Epoch -> Local -->
@@ -195,7 +195,7 @@ import { ToastService } from '@app/shared/toast/toast.service';
     `,
   ],
 })
-export class TimestampComponent {
+export class TimestampComponent implements OnInit {
   private toast = inject(ToastService);
   private timestampService = inject(TimestampService);
 
@@ -204,40 +204,34 @@ export class TimestampComponent {
   localInput = signal<string>('');
   unit = signal<Unit>('seconds');
   autoDetect = signal<boolean>(true);
-  errorMsg = signal<string>('');
 
-  // Epoch -> Local conversion
-  private parsedEpoch = computed(() => {
-    this.errorMsg.set('');
-    // Corrigido: passando 3 argumentos em vez de 2
-    const result = this.timestampService.parseEpoch(
-      this.epochInput(),
-      this.unit(),
-      this.autoDetect()
-    );
-    if (result.error) {
-      this.errorMsg.set(result.error);
+  ngOnInit(): void {
+    this.setNow();
+    const epochNow = this.epochFromLocal();
+    if (epochNow) {
+      this.epochInput.set(epochNow);
     }
-    return result.ms;
-  });
+  }
 
-  // Corrigido: 'format' renomeado para 'formatMs'
-  localOut = computed(() => this.timestampService.formatMs(this.parsedEpoch(), 'local'));
-  utcOut = computed(() => this.timestampService.formatMs(this.parsedEpoch(), 'utc'));
-  isoOut = computed(() => this.timestampService.formatMs(this.parsedEpoch(), 'iso'));
+  private epochConversionResult = computed(() => {
+    return this.timestampService.parseEpoch(this.epochInput(), this.unit(), this.autoDetect());
+  });
+  private parsedEpochMs = computed(() => this.epochConversionResult().ms);
+
+  errorMsg = computed(() => this.epochConversionResult().error);
+  localOut = computed(() => this.timestampService.formatMs(this.parsedEpochMs(), 'local'));
+  utcOut = computed(() => this.timestampService.formatMs(this.parsedEpochMs(), 'utc'));
+  isoOut = computed(() => this.timestampService.formatMs(this.parsedEpochMs(), 'iso'));
 
   // Local -> Epoch conversion
-  // Corrigido: 'fromLocal' agora existe no serviço
   epochFromLocal = computed(() => {
     const ms = this.timestampService.parseLocalDateTime(this.localInput());
     return this.timestampService.msToEpoch(ms, this.unit());
   });
-  // Corrigido: 'getTimezoneOffset' renomeado para 'getTimezoneOffsetString'
   tzOffsetStr = computed(() => this.timestampService.getTimezoneOffsetString());
 
   // actions
   setNow() {
-    // Corrigido: 'getNowAsLocalString' agora existe no serviço
     this.localInput.set(this.timestampService.toDatetimeLocalValue(new Date()));
   }
 
