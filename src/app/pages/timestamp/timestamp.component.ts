@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
+import { Component, signal, computed, inject, ChangeDetectorRef, afterNextRender, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TimestampService, Unit } from '@app/core/services/timestamp.service';
@@ -18,7 +18,6 @@ import { ToastService } from '@app/shared/toast/toast.service';
       [subtitle]="'Convert between Unix epoch and local date/time.'"
       [hasActions]="true"
     >
-      <!-- Epoch -> Local -->
       <h3>Epoch → Local</h3>
       <div class="form-group">
         <div class="form-row">
@@ -26,6 +25,7 @@ import { ToastService } from '@app/shared/toast/toast.service';
             <label for="epoch">Epoch</label>
             <input
               id="epoch"
+              name="epoch"
               type="text"
               placeholder="e.g. 1732567890 or 1732567890123"
               [(ngModel)]="epochInput"
@@ -34,11 +34,9 @@ import { ToastService } from '@app/shared/toast/toast.service';
           <div class="field">
             <label>Unit</label>
             <div class="radio-group">
+              <label><input type="radio" name="unit" value="seconds" [(ngModel)]="unit" /> Seconds</label>
               <label
-                ><input type="radio" name="u1" value="seconds" [(ngModel)]="unit" /> Seconds</label
-              >
-              <label
-                ><input type="radio" name="u1" value="milliseconds" [(ngModel)]="unit" />
+                ><input type="radio" name="unit" value="milliseconds" [(ngModel)]="unit" />
                 Milliseconds</label
               >
             </div>
@@ -46,7 +44,7 @@ import { ToastService } from '@app/shared/toast/toast.service';
         </div>
         <div class="form-row">
           <label class="checkbox-label">
-            <input type="checkbox" [(ngModel)]="autoDetect" />
+            <input type="checkbox" name="autoDetect" [(ngModel)]="autoDetect" />
             Auto-detect ms
           </label>
         </div>
@@ -62,22 +60,19 @@ import { ToastService } from '@app/shared/toast/toast.service';
 
       <div class="hr"></div>
 
-      <!-- Local -> Epoch -->
       <h3>Local → Epoch</h3>
       <div class="form-group">
         <div class="form-row">
           <div class="field">
             <label for="dt">Local date/time</label>
-            <input id="dt" type="datetime-local" [(ngModel)]="localInput" />
+            <input id="dt" name="dt" type="datetime-local" [(ngModel)]="localInput" />
           </div>
           <div class="field">
             <label>Unit</label>
             <div class="radio-group">
+              <label><input type="radio" name="unit2" value="seconds" [(ngModel)]="unit" /> Seconds</label>
               <label
-                ><input type="radio" name="u2" value="seconds" [(ngModel)]="unit" /> Seconds</label
-              >
-              <label
-                ><input type="radio" name="u2" value="milliseconds" [(ngModel)]="unit" />
+                ><input type="radio" name="unit2" value="milliseconds" [(ngModel)]="unit" />
                 Milliseconds</label
               >
             </div>
@@ -113,7 +108,6 @@ import { ToastService } from '@app/shared/toast/toast.service';
   `,
   styles: [
     `
-      /* --- Estrutura de Layout do Formulário --- */
       h3 {
         margin-bottom: 12px;
       }
@@ -132,14 +126,14 @@ import { ToastService } from '@app/shared/toast/toast.service';
         display: flex;
         flex-direction: column;
         gap: 8px;
-        flex: 1 1 200px; /* Allow fields to grow and shrink */
+        flex: 1 1 200px;
       }
       .radio-group,
       .checkbox-label {
         display: flex;
         gap: 16px;
         align-items: center;
-        height: 41px; /* Match input height */
+        height: 41px;
       }
       .radio-group label,
       .checkbox-label {
@@ -155,8 +149,6 @@ import { ToastService } from '@app/shared/toast/toast.service';
         align-items: center;
         gap: 12px;
       }
-
-      /* --- Estilos Visuais --- */
       .info-box {
         margin-top: 16px;
         padding: 12px;
@@ -198,12 +190,18 @@ import { ToastService } from '@app/shared/toast/toast.service';
 export class TimestampComponent implements OnInit {
   private toast = inject(ToastService);
   private timestampService = inject(TimestampService);
+  private cdr = inject(ChangeDetectorRef);
 
-  // state
   epochInput = signal<string>('');
   localInput = signal<string>('');
   unit = signal<Unit>('seconds');
   autoDetect = signal<boolean>(true);
+
+  constructor() {
+    afterNextRender(() => {
+      this.cdr.detectChanges();
+    });
+  }
 
   ngOnInit(): void {
     this.setNow();
@@ -217,20 +215,16 @@ export class TimestampComponent implements OnInit {
     return this.timestampService.parseEpoch(this.epochInput(), this.unit(), this.autoDetect());
   });
   private parsedEpochMs = computed(() => this.epochConversionResult().ms);
-
   errorMsg = computed(() => this.epochConversionResult().error);
   localOut = computed(() => this.timestampService.formatMs(this.parsedEpochMs(), 'local'));
   utcOut = computed(() => this.timestampService.formatMs(this.parsedEpochMs(), 'utc'));
   isoOut = computed(() => this.timestampService.formatMs(this.parsedEpochMs(), 'iso'));
-
-  // Local -> Epoch conversion
   epochFromLocal = computed(() => {
     const ms = this.timestampService.parseLocalDateTime(this.localInput());
     return this.timestampService.msToEpoch(ms, this.unit());
   });
   tzOffsetStr = computed(() => this.timestampService.getTimezoneOffsetString());
 
-  // actions
   setNow() {
     this.localInput.set(this.timestampService.toDatetimeLocalValue(new Date()));
   }
@@ -242,3 +236,4 @@ export class TimestampComponent implements OnInit {
     ok ? this.toast.success('Epoch copied') : this.toast.error('Copy failed');
   }
 }
+

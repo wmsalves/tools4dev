@@ -1,4 +1,4 @@
-import { Component, signal, inject, ChangeDetectorRef, AfterViewInit } from '@angular/core';
+import { Component, signal, inject, ChangeDetectorRef, afterNextRender } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -8,7 +8,7 @@ import { ToolCardComponent } from '@shared/ui/tool-card/tool-card.component';
 import { ButtonComponent } from '@shared/ui/button/button.component';
 import { InputComponent } from '@shared/ui/input/input.component';
 import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
-import { ToastService } from '@app/shared/toast/toast.service';
+import { ToastService } from '@shared/toast/toast.service';
 
 @Component({
   standalone: true,
@@ -107,19 +107,20 @@ import { ToastService } from '@app/shared/toast/toast.service';
     `,
   ],
 })
-export class UrlShortenerComponent implements AfterViewInit {
+export class UrlShortenerComponent {
   private urlShortenerService = inject(UrlShortenerService);
   private toast = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
-  // state
   longUrl = signal<string>('');
   shortUrl = signal<string | null>(null);
   error = signal<string | null>(null);
   isLoading = signal<boolean>(false);
 
-  ngAfterViewInit(): void {
-    this.cdr.detectChanges();
+  constructor() {
+    afterNextRender(() => {
+      this.cdr.detectChanges();
+    });
   }
 
   shortenUrl() {
@@ -154,3 +155,4 @@ export class UrlShortenerComponent implements AfterViewInit {
     this.error.set(null);
   }
 }
+
