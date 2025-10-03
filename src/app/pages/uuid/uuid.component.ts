@@ -32,7 +32,7 @@ import { UuidService } from '@app/core/services/uuid.service';
         <code class="code">{{ current() }}</code>
       </div>
       <ng-template #nores>
-        <div class="muted">No UUID generated yet.</div>
+        <div class="result muted">No UUID generated yet.</div>
       </ng-template>
 
       <div class="hr"></div>
@@ -58,15 +58,7 @@ import { UuidService } from '@app/core/services/uuid.service';
         <div class="form-row">
           <div class="field">
             <label for="count">Count</label>
-            <input
-              id="count"
-              type="number"
-              min="1"
-              max="1000"
-              step="1"
-              [ngModel]="count()"
-              (ngModelChange)="setCount($event)"
-            />
+            <input id="count" type="number" min="1" max="1000" step="1" [(ngModel)]="count" />
           </div>
 
           <div class="btn-group">
@@ -191,11 +183,6 @@ export class UuidComponent {
         );
       }
     });
-  }
-
-  setCount(value: string | number) {
-    const n = Math.floor(Number(value) || 0);
-    this.count.set(Math.max(1, Math.min(1000, n)));
   }
 
   generateOne() {
