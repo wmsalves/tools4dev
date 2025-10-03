@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, signal, effect, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -10,13 +10,20 @@ import { BadgeComponent } from '@shared/ui/badge/badge.component';
 import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
 import { downloadDataUrl } from '@shared/utils/download';
 import { ToastService } from '@app/shared/toast/toast.service';
-
-type Ecc = 'L' | 'M' | 'Q' | 'H';
+import { QrCodeService } from '@app/core/services/qr-code.service';
+import type { QRCodeErrorCorrectionLevel } from 'qrcode';
 
 @Component({
   standalone: true,
   selector: 'app-qr-code',
-  imports: [CommonModule, FormsModule, ToolCardComponent, InputComponent, ButtonComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ToolCardComponent,
+    InputComponent,
+    ButtonComponent,
+    BadgeComponent,
+  ],
   template: `
     <tool-card
       title="QR Code Generator"
@@ -29,8 +36,7 @@ type Ecc = 'L' | 'M' | 'Q' | 'H';
             id="qr-text"
             label="Content"
             placeholder="Type text or URL…"
-            [model]="text()"
-            [modelChange]="onTextChange"
+            [(model)]="text"
           ></ui-input>
 
           <div class="row">
@@ -42,8 +48,8 @@ type Ecc = 'L' | 'M' | 'Q' | 'H';
                 min="64"
                 max="2048"
                 step="16"
-                [(ngModel)]="sizeValue"
-                (ngModelChange)="onSizeChange($event)"
+                [ngModel]="size()"
+                (ngModelChange)="setSize($event)"
               />
             </div>
 
@@ -55,14 +61,14 @@ type Ecc = 'L' | 'M' | 'Q' | 'H';
                 min="0"
                 max="16"
                 step="1"
-                [(ngModel)]="marginValue"
-                (ngModelChange)="onMarginChange($event)"
+                [ngModel]="margin()"
+                (ngModelChange)="setMargin($event)"
               />
             </div>
 
             <div class="field">
               <label for="ecc">Error Correction</label>
-              <select id="ecc" [(ngModel)]="eccValue" (ngModelChange)="onEccChange($event)">
+              <select id="ecc" [(ngModel)]="ecc">
                 <option value="L">L (Low)</option>
                 <option value="M">M (Medium)</option>
                 <option value="Q">Q (Quartile)</option>
@@ -72,8 +78,8 @@ type Ecc = 'L' | 'M' | 'Q' | 'H';
           </div>
 
           <div class="btn-group">
-            <ui-button size="sm" (click)="render()">Generate</ui-button>
-            <ui-button size="sm" variant="secondary" (click)="clear()">Clear</ui-button>
+            <ui-button (click)="render()">Generate</ui-button>
+            <ui-button variant="secondary" (click)="clear()">Clear</ui-button>
             <ui-badge *ngIf="status()" [variant]="status() === 'Ready' ? 'success' : ''">{{
               status()
             }}</ui-badge>
@@ -82,17 +88,15 @@ type Ecc = 'L' | 'M' | 'Q' | 'H';
 
         <div class="col preview">
           <div class="canvas-wrap">
-            <canvas #canvas width="{{ size() }}" height="{{ size() }}"></canvas>
+            <canvas #canvas [width]="size()" [height]="size()"></canvas>
           </div>
 
           <div class="btn-group">
-            <ui-button size="sm" [disabled]="!dataUrl()" (click)="download()"
-              >Download PNG</ui-button
-            >
-            <ui-button size="sm" variant="secondary" [disabled]="!dataUrl()" (click)="copyImage()"
+            <ui-button [disabled]="!dataUrl()" (click)="download()">Download PNG</ui-button>
+            <ui-button variant="secondary" [disabled]="!dataUrl()" (click)="copy(dataUrl())"
               >Copy Image (Data URL)</ui-button
             >
-            <ui-button size="sm" variant="ghost" [disabled]="!text()" (click)="copyText()"
+            <ui-button variant="ghost" [disabled]="!text()" (click)="copy(text())"
               >Copy Text</ui-button
             >
           </div>
@@ -103,19 +107,13 @@ type Ecc = 'L' | 'M' | 'Q' | 'H';
           <div *ngIf="error()" class="err">{{ error() }}</div>
         </div>
       </div>
-
-      <div actions>
-        <small class="muted"
-          >PNG is generated client-side. Test scanning in different distances and lighting.</small
-        >
-      </div>
     </tool-card>
   `,
   styles: [
     `
       .grid {
         display: grid;
-        gap: 16px;
+        gap: 24px;
         grid-template-columns: 1fr;
       }
       @media (min-width: 900px) {
@@ -123,108 +121,73 @@ type Ecc = 'L' | 'M' | 'Q' | 'H';
           grid-template-columns: 1.4fr 1fr;
         }
       }
-
       .row {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 16px;
         flex-wrap: wrap;
       }
       .col {
         display: grid;
-        gap: 12px;
-      }
-      .preview {
+        gap: 16px;
         align-content: start;
       }
-
       .field {
         display: grid;
         gap: 6px;
       }
-      .field input,
-      .field select {
-        padding: 10px 12px;
-        border-radius: 12px;
-        border: 1px solid #e5e7eb;
-        outline: none;
-        background: rgba(0, 0, 0, 0.18);
-        border-color: rgba(255, 255, 255, 0.06);
-      }
-      .field input:focus,
-      .field select:focus {
-        border-color: #0f172a;
-      }
       label {
         font-size: 14px;
-        color: #6b7280;
+        color: var(--muted);
       }
-
       .canvas-wrap {
         display: grid;
         place-items: center;
         background: #fff;
-        border: 1px solid #e5e7eb;
         border-radius: 12px;
-        width: 100%;
-        padding: 12px;
+        padding: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
       }
       canvas {
         display: block;
+        max-width: 100%;
+        height: auto;
       }
-
       .muted {
-        color: #6b7280;
+        color: var(--muted);
       }
       .err {
-        color: #7f1d1d;
-        background: #fef2f2;
-        border: 1px solid #dc2626;
-        padding: 8px 10px;
-        border-radius: 10px;
+        color: #ffb3b3;
+        font-weight: 500;
       }
     `,
   ],
 })
 export class QrCodeComponent {
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
-  private toast = inject(ToastService);
 
-  text = signal<string>('');
+  private toast = inject(ToastService);
+  private qrCodeService = inject(QrCodeService);
+
+  // State Signals
+  text = signal<string>('https://tools4dev.wmsalves.com');
   size = signal<number>(256);
   margin = signal<number>(2);
-  ecc = signal<Ecc>('M');
+  ecc = signal<QRCodeErrorCorrectionLevel>('M');
 
   dataUrl = signal<string>('');
   error = signal<string>('');
   status = signal<'Idle' | 'Ready' | 'Rendering'>('Idle');
 
-  sizeValue = this.size();
-  marginValue = this.margin();
-  eccValue: Ecc = this.ecc();
-
-  onTextChange = (v: string) => this.text.set(v);
-  onSizeChange(v: number) {
-    this.size.set(this.clampNumber(+v, 64, 2048));
+  // Input sanitization methods
+  setSize(value: string | number) {
+    this.size.set(this.clampNumber(Number(value), 64, 2048));
   }
-  onMarginChange(v: number) {
-    this.margin.set(this.clampNumber(+v, 0, 16));
+  setMargin(value: string | number) {
+    this.margin.set(this.clampNumber(Number(value), 0, 16));
   }
-  onEccChange(v: Ecc) {
-    this.ecc.set(v);
-  }
-
-  constructor() {
-    effect(() => {
-      this.sizeValue = this.size();
-      this.marginValue = this.margin();
-      this.eccValue = this.ecc();
-    });
-  }
-
-  private clampNumber(n: number, min: number, max: number) {
-    if (Number.isNaN(n)) return min;
-    return Math.min(max, Math.max(min, Math.floor(n)));
+  private clampNumber(n: number, min: number, max: number): number {
+    return Math.min(max, Math.max(min, Math.floor(n || min)));
   }
 
   async render() {
@@ -234,52 +197,35 @@ export class QrCodeComponent {
 
     const value = (this.text() || '').trim();
     if (!value) {
-      this.status.set('Idle');
-      this.dataUrl.set('');
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
+      this.clear();
       return;
     }
 
     this.status.set('Rendering');
 
-    try {
-      const QRCode = (await import('qrcode')).default;
-      const opts = {
-        errorCorrectionLevel: this.ecc(),
-        width: this.size(),
-        margin: this.margin(),
-        color: { dark: '#000000', light: '#FFFFFF' },
-      } as const;
+    const result = await this.qrCodeService.generate(canvas, value, {
+      errorCorrectionLevel: this.ecc(),
+      width: this.size(),
+      margin: this.margin(),
+      color: { dark: '#000000', light: '#FFFFFF' },
+    });
 
-      await QRCode.toCanvas(canvas, value, opts);
-      this.dataUrl.set(canvas.toDataURL('image/png'));
+    if (result.dataUrl) {
+      this.dataUrl.set(result.dataUrl);
       this.status.set('Ready');
       this.toast.success('QR code generated');
-    } catch (e: any) {
-      this.status.set('Idle');
+    } else {
       this.dataUrl.set('');
-      const msg = e?.message ?? 'Failed to render QR code.';
-      this.error.set(msg);
-      this.toast.error(msg);
+      this.status.set('Idle');
+      this.error.set(result.error ?? 'An unknown error occurred.');
+      this.toast.error(result.error ?? 'Failed to render QR code.');
     }
   }
 
-  async copyImage() {
-    if (!this.dataUrl()) return;
-    const ok = await copyToClipboard(this.dataUrl());
-    ok
-      ? this.toast.success('Image data URL copied')
-      : this.toast.error('Could not copy image data URL');
-  }
-
-  async copyText() {
-    const v = this.text().trim();
-    if (!v) return;
-    const ok = await copyToClipboard(v);
-    ok ? this.toast.success('Text copied') : this.toast.error('Could not copy text');
+  async copy(value: string | null) {
+    if (!value) return;
+    const ok = await copyToClipboard(value);
+    ok ? this.toast.success('Copied to clipboard') : this.toast.error('Could not copy');
   }
 
   download() {
@@ -296,6 +242,5 @@ export class QrCodeComponent {
     const canvas = this.canvasRef?.nativeElement;
     const ctx = canvas?.getContext('2d');
     if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
-    this.toast.info('Cleared');
   }
 }
