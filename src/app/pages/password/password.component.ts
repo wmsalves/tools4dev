@@ -1,13 +1,12 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-import { ToolCardComponent } from '../../shared/ui/tool-card/tool-card.component';
-import { ButtonComponent } from '../../shared/ui/button/button.component';
-import { BadgeComponent } from '../../shared/ui/badge/badge.component';
-import { copyToClipboard } from '../../shared/utils/copy-to-clipboard';
-import { ToastService } from '../../shared/toast/toast.service';
 import { PasswordService } from '@app/core/services/password.service';
+import { ToolCardComponent } from '@shared/ui/tool-card/tool-card.component';
+import { ButtonComponent } from '@shared/ui/button/button.component';
+import { BadgeComponent } from '@shared/ui/badge/badge.component';
+import { ToastService } from '@app/shared/toast/toast.service';
+import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
 
 @Component({
   standalone: true,
@@ -19,41 +18,41 @@ import { PasswordService } from '@app/core/services/password.service';
       subtitle="Create secure passwords with custom rules."
       [hasActions]="true"
     >
-      <div class="row">
-        <div class="field">
-          <label for="len">Length</label>
-          <input
-            id="len"
-            type="number"
-            min="4"
-            max="128"
-            step="1"
-            [ngModel]="len()"
-            (ngModelChange)="setLen($event)"
-          />
+      <!-- Seção de Opções -->
+      <div class="form-group">
+        <div class="form-row">
+          <div class="field">
+            <label for="len">Length</label>
+            <input id="len" type="number" min="4" max="128" step="1" [(ngModel)]="len" />
+          </div>
         </div>
 
-        <label class="chk">
-          <input type="checkbox" [(ngModel)]="useLower" /> Lowercase (a–z)
-        </label>
-        <label class="chk">
-          <input type="checkbox" [(ngModel)]="useUpper" /> Uppercase (A–Z)
-        </label>
-        <label class="chk"> <input type="checkbox" [(ngModel)]="useDigits" /> Digits (0–9) </label>
-        <label class="chk">
-          <input type="checkbox" [(ngModel)]="useSymbols" /> Symbols (!@#$…)
-        </label>
-        <label class="chk">
-          <input type="checkbox" [(ngModel)]="avoidAmbiguous" /> Avoid ambiguous (O0l1|I)
-        </label>
+        <div class="checkbox-group">
+          <label class="chk">
+            <input type="checkbox" [(ngModel)]="useLower" /> Lowercase (a–z)
+          </label>
+          <label class="chk">
+            <input type="checkbox" [(ngModel)]="useUpper" /> Uppercase (A–Z)
+          </label>
+          <label class="chk">
+            <input type="checkbox" [(ngModel)]="useDigits" /> Digits (0–9)
+          </label>
+          <label class="chk">
+            <input type="checkbox" [(ngModel)]="useSymbols" /> Symbols (!@#$…)
+          </label>
+          <label class="chk">
+            <input type="checkbox" [(ngModel)]="avoidAmbiguous" /> Avoid ambiguous (O0l1|I)
+          </label>
+        </div>
       </div>
 
-      <div class="row">
+      <!-- Seção de Ações e Resultado -->
+      <div class="btn-group">
         <ui-button (click)="generateOne()">Generate</ui-button>
-        <ui-button [disabled]="!current()" (click)="copy()">Copy</ui-button>
-        <ui-badge *ngIf="current()" [variant]="strengthBadgeVariant()">{{
-          strengthLabel()
-        }}</ui-badge>
+        <ui-button variant="secondary" [disabled]="!current()" (click)="copy()">Copy</ui-button>
+        <ui-badge *ngIf="current()" [variant]="strengthBadgeVariant()">
+          {{ strengthLabel() }}
+        </ui-badge>
       </div>
 
       <div *ngIf="current(); else nores" class="result">
@@ -68,23 +67,21 @@ import { PasswordService } from '@app/core/services/password.service';
 
       <div class="hr"></div>
 
+      <!-- Seção de Geração em Massa -->
       <h3>Bulk</h3>
-      <div class="row">
-        <div class="field">
-          <label for="count">Count</label>
-          <input
-            id="count"
-            type="number"
-            min="1"
-            max="500"
-            step="1"
-            [ngModel]="count()"
-            (ngModelChange)="setCount($event)"
-          />
+      <div class="form-group">
+        <div class="form-row">
+          <div class="field">
+            <label for="count">Count</label>
+            <input id="count" type="number" min="1" max="500" step="1" [(ngModel)]="count" />
+          </div>
+          <div class="btn-group">
+            <ui-button (click)="generateMany()">Generate list</ui-button>
+            <ui-button variant="secondary" [disabled]="!list().length" (click)="copyList()"
+              >Copy list</ui-button
+            >
+          </div>
         </div>
-        <ui-button (click)="generateMany()">Generate list</ui-button>
-        <ui-button [disabled]="!list().length" (click)="copyList()">Copy list</ui-button>
-        <span class="muted" *ngIf="list().length">({{ list().length }} items)</span>
       </div>
 
       <pre *ngIf="list().length" class="list">{{ list().join('\\n') }}</pre>
@@ -98,66 +95,87 @@ import { PasswordService } from '@app/core/services/password.service';
   `,
   styles: [
     `
-      .row {
+      /* --- Estrutura de Layout do Formulário --- */
+      .form-group {
         display: flex;
-        align-items: center;
-        gap: 16px;
+        flex-direction: column;
+        gap: 16px; /* Espaçamento vertical entre as linhas */
+        margin-bottom: 20px;
+      }
+      .form-row {
+        display: flex;
         flex-wrap: wrap;
+        align-items: flex-end; /* Alinha labels e inputs na base */
+        gap: 16px; /* Espaçamento horizontal entre os campos */
       }
       .field {
-        display: grid;
-        gap: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px; /* Espaço entre label e input */
       }
       .field input {
-        width: 120px;
+        width: 120px; /* Largura padrão para inputs numéricos */
+      }
+      .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px 20px; /* Gap vertical e horizontal */
       }
       .chk {
         display: inline-flex;
         gap: 8px;
         align-items: center;
-        user-select: none;
       }
+      .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      /* --- Estilos Visuais --- */
       .result {
-        margin-top: 16px;
+        margin-bottom: 20px;
       }
       .code {
         background: var(--panel);
-        color: var(--text);
+        color: var(--accent-2);
         padding: 8px 12px;
         border-radius: 8px;
         display: inline-block;
-        border: 1px solid rgba(255, 255, 255, 0.05);
         font-size: 1.1rem;
-        letter-spacing: 0.5px;
+        border: 1px solid var(--glass);
       }
       .muted {
         color: var(--muted);
       }
       .hr {
         height: 1px;
-        background: rgba(255, 255, 255, 0.05);
-        margin: 20px 0;
+        background: var(--glass);
+        margin: 24px 0;
+        border: none;
       }
       .list {
         max-height: 300px;
         overflow: auto;
         background: var(--panel);
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--glass);
         border-radius: 12px;
         padding: 12px;
         white-space: pre-wrap;
         word-break: break-all;
       }
-
       .meter {
-        height: 8px;
-        background: rgba(0, 0, 0, 0.25);
+        height: 6px;
+        background: var(--panel);
         border-radius: 999px;
         overflow: hidden;
-        margin-top: 8px;
+        margin-top: 12px;
         width: 280px;
         max-width: 100%;
-        border: 1px solid rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--glass);
       }
       .bar {
         height: 100%;
@@ -167,13 +185,12 @@ import { PasswordService } from '@app/core/services/password.service';
   ],
 })
 export class PasswordComponent {
-  private toast = inject(ToastService);
   private passwordService = inject(PasswordService);
+  private toast = inject(ToastService);
 
-  // State
+  // state
   current = signal<string>('');
   list = signal<string[]>([]);
-
   len = signal<number>(16);
   useLower = signal<boolean>(true);
   useUpper = signal<boolean>(true);
@@ -182,9 +199,18 @@ export class PasswordComponent {
   avoidAmbiguous = signal<boolean>(true);
   count = signal<number>(10);
 
-  // Derived state
-  strengthBits = computed(() => this.passwordService.estimateEntropy(this.getCfg()));
-  strengthPct = computed(() => Math.max(0, Math.min(100, Math.round(this.strengthBits() / 1.2))));
+  // computed
+  strengthBits = computed(() => {
+    return this.passwordService.estimateEntropy({
+      len: this.len(),
+      lower: this.useLower(),
+      upper: this.useUpper(),
+      digits: this.useDigits(),
+      symbols: this.useSymbols(),
+      avoidAmbiguous: this.avoidAmbiguous(),
+    });
+  });
+  strengthPct = computed(() => Math.max(0, Math.min(100, Math.round(this.strengthBits() / 1.2)))); // mapeia ~120 bits => 100%
   strengthLabel = computed(() => {
     const b = this.strengthBits();
     if (b < 40) return 'Weak';
@@ -192,21 +218,18 @@ export class PasswordComponent {
     if (b < 80) return 'Good';
     return 'Strong';
   });
-  strengthBadgeVariant = computed(() =>
-    this.strengthLabel() === 'Weak' ? 'danger' : this.strengthLabel() === 'Fair' ? '' : 'success'
-  );
+  strengthBadgeVariant = computed(() => {
+    const label = this.strengthLabel();
+    if (label === 'Weak') return 'danger';
+    if (label === 'Fair') return '';
+    return 'success';
+  });
 
-  // ngModelChange handlers for number inputs to clamp values
-  setLen(value: string | number) {
-    this.len.set(this.clamp(Number(value), 4, 128));
-  }
-  setCount(value: string | number) {
-    this.count.set(this.clamp(Number(value), 1, 500));
-  }
-
+  // actions
   generateOne() {
+    const cfg = this.getCfg();
     try {
-      const pwd = this.passwordService.generate(this.getCfg());
+      const pwd = this.passwordService.generate(cfg);
       this.current.set(pwd);
       this.toast.success('Password generated');
     } catch (e: any) {
@@ -233,7 +256,7 @@ export class PasswordComponent {
   }
 
   async copyList() {
-    const text = this.list().join('\n');
+    const text = this.list().join('\\n');
     if (!text) return;
     const ok = await copyToClipboard(text);
     ok ? this.toast.success('List copied') : this.toast.error('Copy failed');
@@ -248,10 +271,5 @@ export class PasswordComponent {
       symbols: this.useSymbols(),
       avoidAmbiguous: this.avoidAmbiguous(),
     };
-  }
-
-  private clamp(n: number, min: number, max: number) {
-    if (Number.isNaN(n)) return min;
-    return Math.min(max, Math.max(min, Math.floor(n)));
   }
 }

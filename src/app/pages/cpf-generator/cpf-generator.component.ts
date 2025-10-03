@@ -18,10 +18,11 @@ import { ToastService } from '@app/shared/toast/toast.service';
       subtitle="Generate valid CPFs for tests, format or validate an input."
       [hasActions]="true"
     >
+      <!-- Seção de Geração -->
       <div class="btn-group">
         <ui-button (click)="gen(true)">Generate (formatted)</ui-button>
         <ui-button (click)="gen(false)" variant="outline">Generate (digits only)</ui-button>
-        <ui-button [disabled]="!result()" (click)="copy()">Copy</ui-button>
+        <ui-button variant="secondary" [disabled]="!result()" (click)="copy()">Copy</ui-button>
       </div>
 
       <div class="result" *ngIf="result(); else nores">
@@ -34,22 +35,28 @@ import { ToastService } from '@app/shared/toast/toast.service';
 
       <div class="hr"></div>
 
-      <div>
-        <ui-input
-          id="cpf"
-          label="Validate / Format"
-          placeholder="type/paste here…"
-          [(model)]="input"
-        ></ui-input>
-      </div>
-
-      <div class="btn-group">
-        <ui-button (click)="format()">Format</ui-button>
-        <ui-button (click)="unformat()" variant="ghost">Unformat</ui-button>
-        <ui-button (click)="clear()" variant="ghost">Clear</ui-button>
-        <ui-badge [variant]="valid() ? 'success' : 'danger'">
-          {{ valid() ? 'Valid' : 'Invalid' }}
-        </ui-badge>
+      <!-- Seção de Validação/Formatação -->
+      <div class="form-group">
+        <div class="field">
+          <ui-input
+            id="cpf"
+            label="Validate / Format"
+            placeholder="type/paste here…"
+            [(model)]="input"
+          ></ui-input>
+        </div>
+        <div class="form-row">
+          <div class="btn-group">
+            <ui-button (click)="format()" [disabled]="!input()">Format</ui-button>
+            <ui-button (click)="unformat()" variant="ghost" [disabled]="!input()"
+              >Unformat</ui-button
+            >
+            <ui-button (click)="clear()" variant="ghost" [disabled]="!input()">Clear</ui-button>
+          </div>
+          <ui-badge *ngIf="input()" [variant]="valid() ? 'success' : 'danger'">
+            {{ valid() ? 'Valid' : 'Invalid' }}
+          </ui-badge>
+        </div>
       </div>
 
       <div actions>
@@ -59,18 +66,32 @@ import { ToastService } from '@app/shared/toast/toast.service';
   `,
   styles: [
     `
-      .muted {
-        color: var(--muted);
+      /* --- Estrutura de Layout do Formulário --- */
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 16px; /* Espaçamento vertical entre as linhas */
+      }
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center; /* Alinha botões e badge verticalmente */
+        gap: 16px; /* Espaçamento horizontal entre os campos */
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px; /* Espaço entre label e input */
       }
       .btn-group {
         display: flex;
-        align-items: center;
-        gap: 8px;
         flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
       }
+
       .result {
         margin-top: 16px;
-        margin-bottom: 16px;
         font-size: 1.1rem;
         display: flex;
         align-items: center;
@@ -78,16 +99,21 @@ import { ToastService } from '@app/shared/toast/toast.service';
         flex-wrap: wrap;
       }
       code {
-        background: #0b1220;
+        background: var(--panel);
         color: var(--accent-2);
         padding: 8px 12px;
         border-radius: 8px;
         letter-spacing: 0.5px;
+        border: 1px solid var(--glass);
+      }
+      .muted {
+        color: var(--muted);
       }
       .hr {
         height: 1px;
-        background: rgba(255, 255, 255, 0.05);
-        margin: 20px 0;
+        background: var(--glass);
+        margin: 24px 0;
+        border: none;
       }
     `,
   ],

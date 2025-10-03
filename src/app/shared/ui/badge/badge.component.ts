@@ -8,25 +8,29 @@ import { NgClass } from '@angular/common';
   template: `<span class="badge" [ngClass]="variant"><ng-content /></span>`,
   styles: [
     `
-      @use '../../styles/tokens' as *;
-
       .badge {
-        background: rgba(0, 0, 0, 0.28);
-        border: 1px solid rgba(255, 255, 255, 0.03);
+        display: inline-flex;
+        align-items: center;
+        background: var(--panel);
+        border: 1px solid var(--glass);
         color: var(--accent-2);
-        padding: 6px 10px;
+        padding: 5px 12px;
         border-radius: 999px;
         font-weight: 700;
+        font-size: 12px;
+        line-height: 1.2;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
       .badge.success {
-        background: rgba(46, 242, 123, 0.08);
+        background: rgba(46, 242, 123, 0.1);
         color: var(--accent);
-        border-color: rgba(46, 242, 123, 0.12);
+        border-color: rgba(46, 242, 123, 0.2);
       }
       .badge.danger {
-        background: rgba(255, 107, 107, 0.06);
+        background: rgba(255, 107, 107, 0.1);
         color: #ffb3b3;
-        border-color: rgba(255, 107, 107, 0.12);
+        border-color: rgba(255, 107, 107, 0.2);
       }
     `,
   ],
