@@ -1,4 +1,4 @@
-import { Component, inject, signal, WritableSignal, computed } from '@angular/core';
+import { Component, inject, signal, computed, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CpfService } from '@app/core/services/cpf.service';
 import { ToolCardComponent } from '@shared/ui/tool-card/tool-card.component';
@@ -12,14 +12,13 @@ import { ToastService } from '@app/shared/toast/toast.service';
   standalone: true,
   selector: 'app-cpf-generator',
   imports: [CommonModule, ToolCardComponent, ButtonComponent, InputComponent, BadgeComponent],
-  providers: [CpfService],
   template: `
     <tool-card
       title="CPF Generator"
       subtitle="Generate valid CPFs for tests, format or validate an input."
       [hasActions]="true"
     >
-      <div class="row">
+      <div class="btn-group">
         <ui-button (click)="gen(true)">Generate (formatted)</ui-button>
         <ui-button (click)="gen(false)" variant="outline">Generate (digits only)</ui-button>
         <ui-button [disabled]="!result()" (click)="copy()">Copy</ui-button>
@@ -40,12 +39,11 @@ import { ToastService } from '@app/shared/toast/toast.service';
           id="cpf"
           label="Validate / Format"
           placeholder="type/paste here…"
-          [model]="input()"
-          [modelChange]="onInputChange"
+          [(model)]="input"
         ></ui-input>
       </div>
 
-      <div class="row">
+      <div class="btn-group">
         <ui-button (click)="format()">Format</ui-button>
         <ui-button (click)="unformat()" variant="ghost">Unformat</ui-button>
         <ui-button (click)="clear()" variant="ghost">Clear</ui-button>
@@ -62,31 +60,34 @@ import { ToastService } from '@app/shared/toast/toast.service';
   styles: [
     `
       .muted {
-        color: #6b7280;
+        color: var(--muted);
       }
-      .row {
+      .btn-group {
         display: flex;
         align-items: center;
         gap: 8px;
         flex-wrap: wrap;
       }
       .result {
-        margin-top: 4px;
-        font-size: 14px;
+        margin-top: 16px;
+        margin-bottom: 16px;
+        font-size: 1.1rem;
         display: flex;
         align-items: center;
         gap: 10px;
+        flex-wrap: wrap;
       }
       code {
         background: #0b1220;
-        color: #e5e7eb;
-        padding: 6px 10px;
+        color: var(--accent-2);
+        padding: 8px 12px;
         border-radius: 8px;
+        letter-spacing: 0.5px;
       }
       .hr {
         height: 1px;
-        background: #e5e7eb;
-        margin: 8px 0;
+        background: rgba(255, 255, 255, 0.05);
+        margin: 20px 0;
       }
     `,
   ],
@@ -99,8 +100,6 @@ export class CpfGeneratorComponent {
   copied = signal(false);
   input = signal('');
   valid = computed(() => this.cpf.isValid(this.input()));
-
-  onInputChange = (v: string) => this.input.set(v);
 
   gen(formatted: boolean) {
     this.result.set(this.cpf.generate({ formatted }));

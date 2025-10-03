@@ -1,5 +1,8 @@
+import { Injectable } from '@angular/core';
+
 export type GenerateOptions = { formatted?: boolean };
 
+@Injectable({ providedIn: 'root' })
 export class CpfService {
   generate(opts: GenerateOptions = { formatted: true }): string {
     const n: number[] = Array.from({ length: 9 }, () => Math.floor(Math.random() * 10));

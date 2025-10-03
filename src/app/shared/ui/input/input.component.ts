@@ -1,10 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'ui-input',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, NgIf],
   template: `
     <label *ngIf="label" [for]="id" class="lbl">{{ label }}</label>
     <input
@@ -13,8 +14,8 @@ import { FormsModule } from '@angular/forms';
       [name]="name || id"
       [placeholder]="placeholder"
       [type]="type"
-      [(ngModel)]="model"
-      (ngModelChange)="modelChange?.($event)"
+      [ngModel]="model"
+      (ngModelChange)="modelChange.emit($event)"
       [attr.autocomplete]="autocomplete ? 'on' : 'off'"
     />
   `,
@@ -42,9 +43,8 @@ export class InputComponent {
   @Input() label?: string;
   @Input() placeholder = '';
   @Input() type: string = 'text';
-  @Input() model = '';
   @Input() autocomplete = false;
 
-  // two-way-ish (template friendly)
-  @Input() modelChange?: (value: string) => void;
+  @Input() model = '';
+  @Output() modelChange = new EventEmitter<string>();
 }
