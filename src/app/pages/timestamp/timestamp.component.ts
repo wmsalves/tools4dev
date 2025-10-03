@@ -1,4 +1,12 @@
-import { Component, signal, computed, inject, ChangeDetectorRef, afterNextRender, OnInit } from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  inject,
+  ChangeDetectorRef,
+  afterNextRender,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TimestampService, Unit } from '@app/core/services/timestamp.service';
@@ -34,7 +42,10 @@ import { ToastService } from '@app/shared/toast/toast.service';
           <div class="field">
             <label>Unit</label>
             <div class="radio-group">
-              <label><input type="radio" name="unit" value="seconds" [(ngModel)]="unit" /> Seconds</label>
+              <label
+                ><input type="radio" name="unit" value="seconds" [(ngModel)]="unit" />
+                Seconds</label
+              >
               <label
                 ><input type="radio" name="unit" value="milliseconds" [(ngModel)]="unit" />
                 Milliseconds</label
@@ -70,7 +81,10 @@ import { ToastService } from '@app/shared/toast/toast.service';
           <div class="field">
             <label>Unit</label>
             <div class="radio-group">
-              <label><input type="radio" name="unit2" value="seconds" [(ngModel)]="unit" /> Seconds</label>
+              <label
+                ><input type="radio" name="unit2" value="seconds" [(ngModel)]="unit" />
+                Seconds</label
+              >
               <label
                 ><input type="radio" name="unit2" value="milliseconds" [(ngModel)]="unit" />
                 Milliseconds</label
@@ -236,4 +250,3 @@ export class TimestampComponent implements OnInit {
     ok ? this.toast.success('Epoch copied') : this.toast.error('Copy failed');
   }
 }
-

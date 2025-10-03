@@ -26,7 +26,7 @@ import { ToastService } from '@shared/toast/toast.service';
             id="long-url"
             label="Long URL"
             placeholder="https://example.com/very/long/url/to/shorten"
-            [(ngModel)]="longUrl"
+            [(model)]="longUrl"
           ></ui-input>
         </div>
 
@@ -155,4 +155,3 @@ export class UrlShortenerComponent {
     this.error.set(null);
   }
 }
-
