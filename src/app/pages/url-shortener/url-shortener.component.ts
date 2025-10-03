@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -16,8 +16,8 @@ import { ToastService } from '@app/shared/toast/toast.service';
   imports: [CommonModule, FormsModule, ToolCardComponent, ButtonComponent, InputComponent],
   template: `
     <tool-card
-      title="URL Shortener"
-      subtitle="Enter a long URL to create a shortened version."
+      [title]="'URL Shortener'"
+      [subtitle]="'Enter a long URL to create a shortened version.'"
       [hasActions]="true"
     >
       <div class="form-group">
@@ -107,15 +107,20 @@ import { ToastService } from '@app/shared/toast/toast.service';
     `,
   ],
 })
-export class UrlShortenerComponent {
+export class UrlShortenerComponent implements AfterViewInit {
   private urlShortenerService = inject(UrlShortenerService);
   private toast = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   // state
   longUrl = signal<string>('');
   shortUrl = signal<string | null>(null);
   error = signal<string | null>(null);
   isLoading = signal<boolean>(false);
+
+  ngAfterViewInit(): void {
+    this.cdr.detectChanges();
+  }
 
   shortenUrl() {
     this.isLoading.set(true);
