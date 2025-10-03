@@ -38,9 +38,7 @@ type ToolCategory = { name: string; tools: ToolItem[] };
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
               [attr.aria-disabled]="t.disabled ? 'true' : null"
-              (click)="$event.stopPropagation()"
             >
-              <span class="dot" [class.go]="!t.disabled"></span>
               <span class="label">{{ t.name }}</span>
             </a>
           </div>
@@ -48,7 +46,28 @@ type ToolCategory = { name: string; tools: ToolItem[] };
       </nav>
 
       <div class="sb-ft">
-        <button class="ghost" type="button" title="Settings" (click)="noop()">⚙️ Settings</button>
+        <a
+          href="https://github.com/wmsalves/tools4dev"
+          target="_blank"
+          class="ghost"
+          title="View on GitHub"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+            ></path>
+          </svg>
+          <span>View on GitHub</span>
+        </a>
       </div>
     </aside>
   `,
@@ -71,9 +90,9 @@ type ToolCategory = { name: string; tools: ToolItem[] };
         box-shadow: 0 8px 30px rgba(2, 6, 23, 0.4);
       }
 
-      /* search */
+      /* --- Search --- */
       .sb-search {
-        padding: 12px;
+        padding: 16px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       }
       .input-wrap {
@@ -81,106 +100,95 @@ type ToolCategory = { name: string; tools: ToolItem[] };
       }
       .input-wrap .icon {
         position: absolute;
-        left: 10px;
+        left: 12px;
         top: 50%;
         transform: translateY(-50%);
         opacity: 0.6;
+        pointer-events: none;
       }
       .input-wrap input {
         width: 100%;
-        padding: 10px 12px 10px 30px;
+        padding: 10px 12px 10px 36px;
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 12px;
         outline: none;
         background: rgba(0, 0, 0, 0.25);
         color: var(--text);
+        font-size: 14px;
       }
       .input-wrap input::placeholder {
         color: var(--muted);
       }
       .input-wrap input:focus {
-        border-color: rgba(46, 242, 123, 0.25);
-        box-shadow: 0 0 0 3px rgba(46, 242, 123, 0.08);
+        border-color: rgba(126, 231, 255, 0.4);
+        box-shadow: 0 0 0 3px rgba(126, 231, 255, 0.1);
       }
 
-      /* nav */
+      /* --- Navigation --- */
       .sb-nav {
-        padding: 8px 8px 12px 8px;
-        overflow: auto;
+        padding: 8px;
+        overflow-y: auto;
+        flex-grow: 1;
       }
+      /* Custom Scrollbar */
       .sb-nav::-webkit-scrollbar {
         width: 10px;
       }
       .sb-nav::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.06);
+        background: rgba(255, 255, 255, 0.08);
         border-radius: 8px;
       }
-      .sb-nav::-webkit-scrollbar-track {
-        background: transparent;
-      }
 
-      .cat {
-        padding: 8px;
-        border-radius: 10px;
-      }
-      .cat + .cat {
-        margin-top: 8px;
-      }
       .cat-hd {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin: 8px 4px;
+        padding: 12px 8px 4px;
         font-size: 12px;
         color: var(--muted);
         text-transform: uppercase;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.05em;
+        font-weight: 600;
       }
 
-      .cat-tools {
-        display: grid;
-        gap: 4px;
-        margin-left: 8px;
-      }
       .tool {
+        position: relative; /* For the active indicator */
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 8px 10px;
+        padding: 9px 12px;
         border-radius: 10px;
         text-decoration: none;
-        color: var(--text);
-        border: 1px solid transparent;
-        background: transparent;
-        transition: background 0.12s ease, border-color 0.12s ease, transform 0.06s ease;
+        color: var(--muted);
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.15s ease-out;
       }
-      .tool:hover {
-        background: rgba(46, 242, 123, 0.06);
-        border-color: rgba(46, 242, 123, 0.12);
-        transform: translateX(2px);
+      .tool:hover:not(.disabled) {
+        color: var(--text);
+        background: rgba(126, 231, 255, 0.06); /* Accent-2 subtle hover */
+        transform: translateX(3px);
       }
       .tool.active {
-        background: rgba(46, 242, 123, 0.12);
-        border-color: rgba(46, 242, 123, 0.24);
+        color: var(--accent);
+        font-weight: 700;
+        background: rgba(46, 242, 123, 0.08); /* Accent-1 active background */
+      }
+      /* --- Active Link Indicator --- */
+      .tool.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 60%;
+        width: 4px;
+        background: var(--accent);
+        border-radius: 0 4px 4px 0;
       }
       .tool.disabled {
         opacity: 0.5;
-        pointer-events: none;
+        cursor: not-allowed;
       }
 
-      .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.15);
-      }
-      .dot.go {
-        background: rgba(46, 242, 123, 0.6);
-      }
-      .label {
-        font-size: 14px;
-      }
-
+      /* --- Footer --- */
       .sb-ft {
         margin-top: auto;
         padding: 12px;
@@ -188,18 +196,25 @@ type ToolCategory = { name: string; tools: ToolItem[] };
         background: rgba(0, 0, 0, 0.15);
       }
       .ghost {
-        appearance: none;
-        border: 1px dashed rgba(255, 255, 255, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        border: 1px dashed rgba(255, 255, 255, 0.08);
         background: transparent;
         cursor: pointer;
         font-size: 14px;
         color: var(--muted);
         padding: 8px 10px;
         border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.15s ease-out;
       }
       .ghost:hover {
         color: var(--text);
-        border-color: rgba(46, 242, 123, 0.25);
+        border-color: var(--accent-2);
+        background: rgba(126, 231, 255, 0.05);
       }
     `,
   ],
@@ -246,6 +261,4 @@ export class SidebarComponent {
     const target = event.target as HTMLInputElement;
     this.query.set(target.value);
   }
-
-  noop() {}
 }
