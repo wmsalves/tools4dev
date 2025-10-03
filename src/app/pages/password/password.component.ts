@@ -14,11 +14,10 @@ import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
   imports: [CommonModule, FormsModule, ToolCardComponent, ButtonComponent, BadgeComponent],
   template: `
     <tool-card
-      title="Password Generator"
-      subtitle="Create secure passwords with custom rules."
+      [title]="'Password Generator'"
+      [subtitle]="'Create secure passwords with custom rules.'"
       [hasActions]="true"
     >
-      <!-- Seção de Opções -->
       <div class="form-group">
         <div class="form-row">
           <div class="field">
@@ -46,13 +45,14 @@ import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
         </div>
       </div>
 
-      <!-- Seção de Ações e Resultado -->
-      <div class="btn-group">
-        <ui-button (click)="generateOne()">Generate</ui-button>
-        <ui-button variant="secondary" [disabled]="!current()" (click)="copy()">Copy</ui-button>
-        <ui-badge *ngIf="current()" [variant]="strengthBadgeVariant()">
-          {{ strengthLabel() }}
-        </ui-badge>
+      <div class="form-group">
+        <div class="btn-group">
+          <ui-button (click)="generateOne()">Generate</ui-button>
+          <ui-button variant="secondary" [disabled]="!current()" (click)="copy()">Copy</ui-button>
+          <ui-badge *ngIf="current()" [variant]="strengthBadgeVariant()">
+            {{ strengthLabel() }}
+          </ui-badge>
+        </div>
       </div>
 
       <div *ngIf="current(); else nores" class="result">
@@ -67,7 +67,6 @@ import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
 
       <div class="hr"></div>
 
-      <!-- Seção de Geração em Massa -->
       <h3>Bulk</h3>
       <div class="form-group">
         <div class="form-row">
@@ -95,47 +94,48 @@ import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
   `,
   styles: [
     `
-      /* --- Estrutura de Layout do Formulário --- */
+      h3 {
+        margin-bottom: 12px;
+      }
       .form-group {
         display: flex;
         flex-direction: column;
-        gap: 16px; /* Espaçamento vertical entre as linhas */
+        gap: 16px;
         margin-bottom: 20px;
       }
       .form-row {
         display: flex;
         flex-wrap: wrap;
-        align-items: flex-end; /* Alinha labels e inputs na base */
-        gap: 16px; /* Espaçamento horizontal entre os campos */
+        align-items: flex-end;
+        gap: 16px;
       }
       .field {
         display: flex;
         flex-direction: column;
-        gap: 8px; /* Espaço entre label e input */
+        gap: 8px;
       }
       .field input {
-        width: 120px; /* Largura padrão para inputs numéricos */
+        width: 120px;
       }
       .checkbox-group {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 12px 20px; /* Gap vertical e horizontal */
+        gap: 12px 20px;
       }
       .chk {
         display: inline-flex;
         gap: 8px;
         align-items: center;
+        color: var(--muted);
+        cursor: pointer;
       }
       .btn-group {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         gap: 12px;
-        margin-bottom: 20px;
       }
-
-      /* --- Estilos Visuais --- */
       .result {
         margin-bottom: 20px;
       }
@@ -187,8 +187,6 @@ import { copyToClipboard } from '@shared/utils/copy-to-clipboard';
 export class PasswordComponent {
   private passwordService = inject(PasswordService);
   private toast = inject(ToastService);
-
-  // state
   current = signal<string>('');
   list = signal<string[]>([]);
   len = signal<number>(16);
@@ -198,8 +196,6 @@ export class PasswordComponent {
   useSymbols = signal<boolean>(false);
   avoidAmbiguous = signal<boolean>(true);
   count = signal<number>(10);
-
-  // computed
   strengthBits = computed(() => {
     return this.passwordService.estimateEntropy({
       len: this.len(),
@@ -210,7 +206,7 @@ export class PasswordComponent {
       avoidAmbiguous: this.avoidAmbiguous(),
     });
   });
-  strengthPct = computed(() => Math.max(0, Math.min(100, Math.round(this.strengthBits() / 1.2)))); // mapeia ~120 bits => 100%
+  strengthPct = computed(() => Math.max(0, Math.min(100, Math.round(this.strengthBits() / 1.2))));
   strengthLabel = computed(() => {
     const b = this.strengthBits();
     if (b < 40) return 'Weak';
@@ -224,8 +220,6 @@ export class PasswordComponent {
     if (label === 'Fair') return '';
     return 'success';
   });
-
-  // actions
   generateOne() {
     const cfg = this.getCfg();
     try {
@@ -236,14 +230,12 @@ export class PasswordComponent {
       this.toast.error(e?.message ?? 'Failed to generate password');
     }
   }
-
   async copy() {
     const v = this.current();
     if (!v) return;
     const ok = await copyToClipboard(v);
     ok ? this.toast.success('Copied password') : this.toast.error('Copy failed');
   }
-
   generateMany() {
     const cfg = this.getCfg();
     try {
@@ -254,14 +246,12 @@ export class PasswordComponent {
       this.toast.error(e?.message ?? 'Failed to generate passwords');
     }
   }
-
   async copyList() {
-    const text = this.list().join('\\n');
+    const text = this.list().join('\n');
     if (!text) return;
     const ok = await copyToClipboard(text);
     ok ? this.toast.success('List copied') : this.toast.error('Copy failed');
   }
-
   private getCfg() {
     return {
       len: this.len(),
