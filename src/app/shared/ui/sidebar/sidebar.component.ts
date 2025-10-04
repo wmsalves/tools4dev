@@ -1,5 +1,5 @@
 import { Component, computed, signal } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
+import { NgFor } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 type ToolItem = { name: string; path: string; disabled?: boolean };
@@ -11,7 +11,6 @@ type ToolCategory = { name: string; tools: ToolItem[] };
   imports: [NgFor, RouterLink, RouterLinkActive],
   template: `
     <aside class="sb">
-      <!-- Search -->
       <div class="sb-search">
         <div class="input-wrap">
           <span class="icon">🔎</span>
@@ -24,11 +23,9 @@ type ToolCategory = { name: string; tools: ToolItem[] };
         </div>
       </div>
 
-      <!-- Navigation -->
       <nav class="sb-nav">
         <div class="cat" *ngFor="let category of filtered()">
           <div class="cat-hd">{{ category.name }}</div>
-
           <div class="cat-tools">
             <a
               *ngFor="let t of category.tools"
@@ -39,6 +36,7 @@ type ToolCategory = { name: string; tools: ToolItem[] };
               [routerLinkActiveOptions]="{ exact: true }"
               [attr.aria-disabled]="t.disabled ? 'true' : null"
             >
+              <span class="dot" [class.go]="!t.disabled"></span>
               <span class="label">{{ t.name }}</span>
             </a>
           </div>
@@ -48,25 +46,24 @@ type ToolCategory = { name: string; tools: ToolItem[] };
       <div class="sb-ft">
         <a
           href="https://github.com/wmsalves/tools4dev"
-          target="_blank"
           class="ghost"
-          title="View on GitHub"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
-            ></path>
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M8 0C3.58 0 0 3.58 0 8C0 11.54 2.29 14.53 5.47 15.59C5.87 15.66 6.02 15.42 6.02 15.21C6.02 15.02 6.01 14.39 6.01 13.72C4 14.09 3.48 13.23 3.32 12.78C3.23 12.55 2.84 11.84 2.5 11.65C2.22 11.5 1.82 11.13 2.49 11.12C3.12 11.11 3.57 11.7 3.72 11.94C4.44 13.15 5.59 12.81 6.05 12.6C6.12 12.07 6.33 11.73 6.56 11.53C4.78 11.33 2.92 10.64 2.92 7.58C2.92 6.71 3.23 5.99 3.74 5.43C3.66 5.23 3.38 4.41 3.82 3.31C3.82 3.31 4.49 3.1 6.02 4.13C6.66 3.95 7.34 3.86 8.02 3.86C8.7 3.86 9.38 3.95 10.02 4.13C11.55 3.09 12.22 3.31 12.22 3.31C12.66 4.41 12.38 5.23 12.3 5.43C12.81 5.99 13.12 6.7 13.12 7.58C13.12 10.65 11.25 11.33 9.47 11.53C9.76 11.78 10.01 12.26 10.01 13.01C10.01 14.08 10 14.94 10 15.21C10 15.42 10.15 15.67 10.55 15.59C13.71 14.53 16 11.53 16 8C16 3.58 12.42 0 8 0Z"
+            />
           </svg>
-          <span>View on GitHub</span>
+          <span>GitHub</span>
         </a>
       </div>
     </aside>
@@ -76,31 +73,27 @@ type ToolCategory = { name: string; tools: ToolItem[] };
       :host {
         display: block;
       }
-
       .sb {
         position: sticky;
-        top: 58px;
+        top: 0;
         display: flex;
         flex-direction: column;
         width: 280px;
         min-width: 240px;
-        max-height: calc(100dvh - 58px);
+        max-height: 100dvh;
         background: var(--panel);
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
-        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.4);
+        border-right: 1px solid var(--glass);
       }
-
-      /* --- Search --- */
       .sb-search {
-        padding: 16px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 12px;
+        border-bottom: 1px solid var(--glass);
       }
       .input-wrap {
         position: relative;
       }
       .input-wrap .icon {
         position: absolute;
-        left: 12px;
+        left: 10px;
         top: 50%;
         transform: translateY(-50%);
         opacity: 0.6;
@@ -108,113 +101,110 @@ type ToolCategory = { name: string; tools: ToolItem[] };
       }
       .input-wrap input {
         width: 100%;
-        padding: 10px 12px 10px 36px;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 10px 12px 10px 34px;
+        border: 1px solid var(--glass);
         border-radius: 12px;
         outline: none;
         background: rgba(0, 0, 0, 0.25);
         color: var(--text);
-        font-size: 14px;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
       }
       .input-wrap input::placeholder {
         color: var(--muted);
       }
       .input-wrap input:focus {
-        border-color: rgba(126, 231, 255, 0.4);
-        box-shadow: 0 0 0 3px rgba(126, 231, 255, 0.1);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(46, 242, 123, 0.1);
       }
-
-      /* --- Navigation --- */
       .sb-nav {
         padding: 8px;
         overflow-y: auto;
         flex-grow: 1;
       }
-      /* Custom Scrollbar */
-      .sb-nav::-webkit-scrollbar {
-        width: 10px;
+      .cat {
+        padding: 8px 0;
       }
-      .sb-nav::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
+      .cat + .cat {
+        border-top: 1px solid var(--glass);
+        margin-top: 8px;
       }
-
       .cat-hd {
-        padding: 12px 8px 4px;
+        margin: 8px 12px;
         font-size: 12px;
         color: var(--muted);
         text-transform: uppercase;
         letter-spacing: 0.05em;
         font-weight: 600;
       }
-
+      .cat-tools {
+        display: grid;
+        gap: 4px;
+      }
       .tool {
-        position: relative; /* For the active indicator */
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 9px 12px;
+        gap: 10px;
+        padding: 8px 12px;
         border-radius: 10px;
         text-decoration: none;
         color: var(--muted);
-        font-weight: 500;
-        font-size: 14px;
-        transition: all 0.15s ease-out;
+        border-left: 3px solid transparent;
+        transition: all 0.15s ease;
       }
-      .tool:hover:not(.disabled) {
-        color: var(--text);
-        background: rgba(126, 231, 255, 0.06); /* Accent-2 subtle hover */
-        transform: translateX(3px);
+      .tool:hover {
+        background: rgba(126, 231, 255, 0.06);
+        color: var(--accent-2);
       }
       .tool.active {
         color: var(--accent);
-        font-weight: 700;
-        background: rgba(46, 242, 123, 0.08); /* Accent-1 active background */
-      }
-      /* --- Active Link Indicator --- */
-      .tool.active::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        height: 60%;
-        width: 4px;
-        background: var(--accent);
-        border-radius: 0 4px 4px 0;
+        background: rgba(46, 242, 123, 0.08);
+        border-left-color: var(--accent);
       }
       .tool.disabled {
         opacity: 0.5;
-        cursor: not-allowed;
+        pointer-events: none;
       }
-
-      /* --- Footer --- */
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.15);
+      }
+      .dot.go {
+        background: rgba(126, 231, 255, 0.4);
+      }
+      .tool.active .dot.go {
+        background: var(--accent);
+      }
+      .label {
+        font-size: 14px;
+        font-weight: 500;
+      }
       .sb-ft {
         margin-top: auto;
         padding: 12px;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        border-top: 1px solid var(--glass);
         background: rgba(0, 0, 0, 0.15);
       }
       .ghost {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        width: 100%;
-        border: 1px dashed rgba(255, 255, 255, 0.08);
+        appearance: none;
+        border: none;
         background: transparent;
         cursor: pointer;
         font-size: 14px;
         color: var(--muted);
         padding: 8px 10px;
         border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         text-decoration: none;
-        transition: all 0.15s ease-out;
+        width: 100%;
+        transition: color 0.15s ease, background 0.15s ease;
       }
       .ghost:hover {
         color: var(--text);
-        border-color: var(--accent-2);
-        background: rgba(126, 231, 255, 0.05);
+        background: rgba(255, 255, 255, 0.04);
       }
     `,
   ],
@@ -241,7 +231,7 @@ export class SidebarComponent {
     {
       name: 'Formatting',
       tools: [
-        { name: 'JSON Formatter', path: '/json', disabled: true },
+        { name: 'JSON Formatter', path: '/json-formatter' },
         { name: 'Text Diff Checker', path: '/diff', disabled: true },
       ],
     },

@@ -13,35 +13,51 @@ import { ToolCardComponent } from '@shared/ui/tool-card/tool-card.component';
     <section class="grid">
       <a routerLink="/cpf-generator" class="card-link">
         <tool-card
-          title="CPF Generator"
-          subtitle="Create valid Brazilian CPF numbers for testing."
+          [title]="'CPF Generator'"
+          [subtitle]="'Create valid Brazilian CPF numbers for testing.'"
         ></tool-card>
       </a>
 
       <a routerLink="/qr-code" class="card-link">
-        <tool-card title="QR Code" subtitle="Generate QR codes from any text or URL."></tool-card>
+        <tool-card
+          [title]="'QR Code Generator'"
+          [subtitle]="'Generate QR codes from any text or URL.'"
+        ></tool-card>
       </a>
 
       <a routerLink="/uuid" class="card-link">
-        <tool-card title="UUID Generator" subtitle="Generate RFC 4122 v4 UUIDs."></tool-card>
+        <tool-card
+          [title]="'UUID Generator'"
+          [subtitle]="'Generate RFC 4122 v4 UUIDs.'"
+        ></tool-card>
       </a>
 
       <a routerLink="/password" class="card-link">
         <tool-card
-          title="Password Generator"
-          subtitle="Create secure, custom passwords."
+          [title]="'Password Generator'"
+          [subtitle]="'Create secure, custom passwords.'"
         ></tool-card>
       </a>
 
       <a routerLink="/timestamp" class="card-link">
         <tool-card
-          title="Timestamp Converter"
-          subtitle="Convert between Unix and local time."
+          [title]="'Timestamp Converter'"
+          [subtitle]="'Convert between Unix and local time.'"
         ></tool-card>
       </a>
 
-      <a routerLink="/url-shortener" class="card-link disabled">
-        <tool-card title="URL Shortener" subtitle="Shorten long URLs for sharing."></tool-card>
+      <a routerLink="/url-shortener" class="card-link">
+        <tool-card
+          [title]="'URL Shortener'"
+          [subtitle]="'Shorten long URLs for sharing.'"
+        ></tool-card>
+      </a>
+
+      <a routerLink="/json-formatter" class="card-link">
+        <tool-card
+          [title]="'JSON Formatter'"
+          [subtitle]="'Format, validate, and minify JSON data.'"
+        ></tool-card>
       </a>
     </section>
   `,

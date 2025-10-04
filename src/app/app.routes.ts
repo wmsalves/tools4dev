@@ -40,5 +40,13 @@ export const routes: Routes = [
       import('./pages/timestamp/timestamp.component').then((m) => m.TimestampComponent),
     title: 'Tools4Dev • Timestamp Converter',
   },
+  {
+    path: 'json-formatter',
+    loadComponent: () =>
+      import('./pages/json-formatter/json-formatter.component').then(
+        (m) => m.JsonFormatterComponent
+      ),
+    title: 'Tools4Dev • JSON Formatter',
+  },
   { path: '**', redirectTo: '' },
 ];
