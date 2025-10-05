@@ -36,7 +36,6 @@ type ToolCategory = { name: string; tools: ToolItem[] };
               [routerLinkActiveOptions]="{ exact: true }"
               [attr.aria-disabled]="t.disabled ? 'true' : null"
             >
-              <span class="dot" [class.go]="!t.disabled"></span>
               <span class="label">{{ t.name }}</span>
             </a>
           </div>
@@ -151,7 +150,7 @@ type ToolCategory = { name: string; tools: ToolItem[] };
         border-left: 3px solid transparent;
         transition: all 0.15s ease;
       }
-      .tool:hover {
+      .tool:hover:not(.disabled) {
         background: rgba(126, 231, 255, 0.06);
         color: var(--accent-2);
       }
@@ -163,18 +162,6 @@ type ToolCategory = { name: string; tools: ToolItem[] };
       .tool.disabled {
         opacity: 0.5;
         pointer-events: none;
-      }
-      .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.15);
-      }
-      .dot.go {
-        background: rgba(126, 231, 255, 0.4);
-      }
-      .tool.active .dot.go {
-        background: var(--accent);
       }
       .label {
         font-size: 14px;
@@ -225,6 +212,7 @@ export class SidebarComponent {
       tools: [
         { name: 'URL Shortener', path: '/url-shortener' },
         { name: 'Timestamp Converter', path: '/timestamp' },
+        { name: 'JWT Decoder', path: '/jwt-decoder' },
         { name: 'Regex Tester', path: '/regex', disabled: true },
       ],
     },

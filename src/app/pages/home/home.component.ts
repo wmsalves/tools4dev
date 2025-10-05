@@ -59,6 +59,13 @@ import { ToolCardComponent } from '@shared/ui/tool-card/tool-card.component';
           [subtitle]="'Format, validate, and minify JSON data.'"
         ></tool-card>
       </a>
+
+      <a routerLink="/jwt-decoder" class="card-link">
+        <tool-card
+          [title]="'JWT Decoder'"
+          [subtitle]="'Decode and inspect JSON Web Tokens.'"
+        ></tool-card>
+      </a>
     </section>
   `,
   styles: [

@@ -48,5 +48,11 @@ export const routes: Routes = [
       ),
     title: 'Tools4Dev • JSON Formatter',
   },
+  {
+    path: 'jwt-decoder',
+    loadComponent: () =>
+      import('./pages/jwt-decoder/jwt-decoder.component').then((m) => m.JwtDecoderComponent),
+    title: 'Tools4Dev • JWT Decoder',
+  },
   { path: '**', redirectTo: '' },
 ];
