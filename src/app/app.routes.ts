@@ -54,5 +54,11 @@ export const routes: Routes = [
       import('./pages/jwt-decoder/jwt-decoder.component').then((m) => m.JwtDecoderComponent),
     title: 'Tools4Dev • JWT Decoder',
   },
+  {
+    path: 'diff-checker',
+    loadComponent: () =>
+      import('./pages/diff-checker/diff-checker.component').then((m) => m.DiffCheckerComponent),
+    title: 'Tools4Dev • Text Diff Checker',
+  },
   { path: '**', redirectTo: '' },
 ];

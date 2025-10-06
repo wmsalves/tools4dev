@@ -220,7 +220,7 @@ export class SidebarComponent {
       name: 'Formatting',
       tools: [
         { name: 'JSON Formatter', path: '/json-formatter' },
-        { name: 'Text Diff Checker', path: '/diff', disabled: true },
+        { name: 'Text Diff Checker', path: '/diff-checker' },
       ],
     },
   ];

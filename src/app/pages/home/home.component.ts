@@ -66,6 +66,13 @@ import { ToolCardComponent } from '@shared/ui/tool-card/tool-card.component';
           [subtitle]="'Decode and inspect JSON Web Tokens.'"
         ></tool-card>
       </a>
+
+      <a routerLink="/diff-checker" class="card-link">
+        <tool-card
+          [title]="'Text Diff Checker'"
+          [subtitle]="'Compare two blocks of text to see the differences.'"
+        ></tool-card>
+      </a>
     </section>
   `,
   styles: [
