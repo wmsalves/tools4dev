@@ -213,7 +213,7 @@ export class SidebarComponent {
         { name: 'URL Shortener', path: '/url-shortener' },
         { name: 'Timestamp Converter', path: '/timestamp' },
         { name: 'JWT Decoder', path: '/jwt-decoder' },
-        { name: 'Regex Tester', path: '/regex', disabled: true },
+        { name: 'Regex Tester', path: '/regex-tester' },
       ],
     },
     {

@@ -60,5 +60,11 @@ export const routes: Routes = [
       import('./pages/diff-checker/diff-checker.component').then((m) => m.DiffCheckerComponent),
     title: 'Tools4Dev • Text Diff Checker',
   },
+  {
+    path: 'regex-tester',
+    loadComponent: () =>
+      import('./pages/regex-tester/regex-tester.component').then((m) => m.RegexTesterComponent),
+    title: 'Tools4Dev • Regex Tester',
+  },
   { path: '**', redirectTo: '' },
 ];

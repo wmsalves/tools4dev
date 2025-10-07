@@ -73,6 +73,13 @@ import { ToolCardComponent } from '@shared/ui/tool-card/tool-card.component';
           [subtitle]="'Compare two blocks of text to see the differences.'"
         ></tool-card>
       </a>
+
+      <a routerLink="/regex-tester" class="card-link">
+        <tool-card
+          [title]="'Regex Tester'"
+          [subtitle]="'Test and debug regular expressions in real-time.'"
+        ></tool-card>
+      </a>
     </section>
   `,
   styles: [
